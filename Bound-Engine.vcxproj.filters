@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
@@ -13,59 +9,93 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\GUI">
+    <Filter Include="Core">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Core\GUI">
       <UniqueIdentifier>{81c871a3-2a26-42de-9bd2-1c11f39cdde2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Main">
-      <UniqueIdentifier>{4fc3e7b6-f9c2-41b1-ab16-45553ac1d440}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Renderer">
+    <Filter Include="Core\Render">
       <UniqueIdentifier>{443c92be-a0e6-40b5-888a-f3c5ca36a519}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\FrameBuffer">
+    <Filter Include="Core\FrameBuffer">
       <UniqueIdentifier>{f9e4809e-05b4-43c2-8830-22029fc7bf99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Game">
+      <UniqueIdentifier>{390794bf-3b9f-472e-9e7e-379af6e1e963}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Math">
+      <UniqueIdentifier>{3da89b9a-71ca-4c70-9212-1d1fe6b660a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{4fc3e7b6-f9c2-41b1-ab16-45553ac1d440}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Tools">
+      <UniqueIdentifier>{bc277539-3274-4c54-b98b-1d84779a56b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Assets">
+      <UniqueIdentifier>{cbaddb4c-5976-409c-a5a9-62d63ebdd726}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Assets\Levels">
+      <UniqueIdentifier>{d24a0d48-df70-44ab-9544-636be4c6fb33}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Render\Renderer.cpp">
-      <Filter>Source Files\Renderer</Filter>
+      <Filter>Core\Render</Filter>
     </ClCompile>
     <ClCompile Include="Platform\Window.cpp">
-      <Filter>Source Files\FrameBuffer</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Application.cpp">
-      <Filter>Source Files\Main</Filter>
+      <Filter>Core\FrameBuffer</Filter>
     </ClCompile>
     <ClCompile Include="Core\Render\Camera.cpp">
-      <Filter>Source Files\Renderer</Filter>
+      <Filter>Core\Render</Filter>
     </ClCompile>
     <ClCompile Include="Core\Render\Framebuffer.cpp">
-      <Filter>Source Files\FrameBuffer</Filter>
+      <Filter>Core\FrameBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Application.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Game\Level.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Game\World.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">
-      <Filter>Source Files\Main</Filter>
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Math\Vector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Render\Framebuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Render\Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Render\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Platform\Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Render\Renderer.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Render\Camera.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Math\Vector.h">
+      <Filter>Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Math\Geometry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Game\World.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Game\Level.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -82,5 +112,7 @@
     <None Include="COMPLETION_SUMMARY.md" />
     <None Include="PROJECT_REPORT.md" />
     <None Include="DEPENDENCIES.md" />
+    <None Include="packages.config" />
+    <None Include="STRUCTURE.md" />
   </ItemGroup>
 </Project>

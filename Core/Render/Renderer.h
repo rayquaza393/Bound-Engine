@@ -2,20 +2,9 @@
 
 #include "Framebuffer.h"
 #include "Camera.h"
-#include <vector>
+#include "../Math/Geometry.h"
 
 namespace Bound {
-
-	struct Vertex {
-		Vec3 position;
-		Vec3 color;
-		Vec3 normal;
-	};
-
-	struct Mesh {
-		std::vector<Vertex> vertices;
-		std::vector<uint32_t> indices;
-	};
 
 	class Renderer {
 	public:

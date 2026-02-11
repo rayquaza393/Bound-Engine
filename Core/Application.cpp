@@ -63,12 +63,17 @@ namespace Bound {
 		float moveSpeed = 5.0f * deltaTime_; // 5 units per second
 		float lookSpeed = 0.002f; // Radians per pixel
 
+		// Forward/Backward (W/S)
 		if (window_->isKeyPressed('W')) camera->moveForward(moveSpeed);
 		if (window_->isKeyPressed('S')) camera->moveForward(-moveSpeed);
-		if (window_->isKeyPressed('A')) camera->moveRight(-moveSpeed);
-		if (window_->isKeyPressed('D')) camera->moveRight(moveSpeed);
-		if (window_->isKeyPressed(VK_SPACE)) camera->moveUp(moveSpeed);
-		if (window_->isKeyPressed(VK_CONTROL)) camera->moveUp(-moveSpeed);
+		
+		// Left/Right strafe (Q/E)
+		if (window_->isKeyPressed('Q')) camera->moveRight(-moveSpeed);
+		if (window_->isKeyPressed('E')) camera->moveRight(moveSpeed);
+		
+		// Up/Down (SPACE raises, SHIFT lowers)
+		if (window_->isKeyPressed(VK_SPACE)) camera->moveUp(-moveSpeed);
+		if (window_->isKeyPressed(VK_SHIFT)) camera->moveUp(moveSpeed);
 
 		// Mouse look
 		if (window_->isMouseButtonPressed(1)) { // Right mouse button
@@ -84,6 +89,11 @@ namespace Bound {
 			lastMouseX = mouseX;
 			lastMouseY = mouseY;
 		}
+		
+		// Keyboard rotation (A/D for yaw only)
+		float rotSpeed = 2.0f * deltaTime_; // Radians per second
+		if (window_->isKeyPressed('A')) camera->rotate(-rotSpeed, 0.0f); // Rotate left
+		if (window_->isKeyPressed('D')) camera->rotate(rotSpeed, 0.0f);  // Rotate right
 	}
 
 }

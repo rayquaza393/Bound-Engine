@@ -1,8 +1,12 @@
 #pragma once
 
 #include "Core/Application.h"
+#include "Core/Game/World.h"
+#include "Core/Math/Geometry.h"
 
-class Game : public Bound::Application {
+using namespace Bound;
+
+class Game : public Application {
 public:
 	Game();
 	~Game();
@@ -14,9 +18,9 @@ protected:
 	void onShutdown() override;
 
 private:
-	Bound::Mesh testMesh_;
-	bool meshInitialized_ = false;
+	World* world_;
+	Mesh testMesh_;
+	bool meshInitialized_;
 	
 	void initializeMesh();
 };
-

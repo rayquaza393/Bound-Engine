@@ -2,69 +2,83 @@
 #include <windows.h>
 #include <cstdio>
 
-Game::Game() : Bound::Application("Bound Engine", 1024, 768) {
+using namespace Bound;
+
+Game::Game() : Application("Bound Engine", 1024, 768), world_(nullptr), meshInitialized_(false) {
 }
 
 Game::~Game() {
 }
 
 void Game::onInit() {
-	OutputDebugStringA("=== Game::onInit() called ===\n");
+	// Initialize world
+	world_ = new World();
+	
+	// Try to load a level from Assets/Levels/Level1.data
+	if (!world_->loadLevel("Assets/Levels/Level1.data")) {
+		OutputDebugStringA("No level file found - falling back to test pyramid\n");
+	}
 }
 
 void Game::initializeMesh() {
 	if (meshInitialized_) return;
 	meshInitialized_ = true;
 	
-	OutputDebugStringA("=== initializeMesh() creating pyramid ===\n");
+	OutputDebugStringA("=== Creating pyramid and floor ===\n");
 	
-	// Create a simple test pyramid mesh
-	testMesh_.vertices.push_back(Bound::Vertex{Bound::Vec3(0.0f, 1.0f, 0.0f), Bound::Vec3(1.0f, 0.0f, 0.0f)});      // Top (red)
-	testMesh_.vertices.push_back(Bound::Vertex{Bound::Vec3(-1.0f, -1.0f, 1.0f), Bound::Vec3(0.0f, 1.0f, 0.0f)});    // Front-left (green)
-	testMesh_.vertices.push_back(Bound::Vertex{Bound::Vec3(1.0f, -1.0f, 1.0f), Bound::Vec3(0.0f, 0.0f, 1.0f)});     // Front-right (blue)
-	testMesh_.vertices.push_back(Bound::Vertex{Bound::Vec3(1.0f, -1.0f, -1.0f), Bound::Vec3(1.0f, 1.0f, 0.0f)});    // Back-right (yellow)
-	testMesh_.vertices.push_back(Bound::Vertex{Bound::Vec3(-1.0f, -1.0f, -1.0f), Bound::Vec3(1.0f, 0.0f, 1.0f)});   // Back-left (magenta)
+	// Create pyramid mesh - single color (white)
+	testMesh_.vertices.push_back(Vertex{Vec3(0.0f, -1.0f, 0.0f), Vec3(1.0f, 1.0f, 1.0f)});      // Top
+	testMesh_.vertices.push_back(Vertex{Vec3(-1.0f, 1.0f, 1.0f), Vec3(1.0f, 1.0f, 1.0f)});    // Front-left
+	testMesh_.vertices.push_back(Vertex{Vec3(1.0f, 1.0f, 1.0f), Vec3(1.0f, 1.0f, 1.0f)});     // Front-right
+	testMesh_.vertices.push_back(Vertex{Vec3(1.0f, 1.0f, -1.0f), Vec3(1.0f, 1.0f, 1.0f)});    // Back-right
+	testMesh_.vertices.push_back(Vertex{Vec3(-1.0f, 1.0f, -1.0f), Vec3(1.0f, 1.0f, 1.0f)});   // Back-left
 
-	char buffer[256];
-	sprintf_s(buffer, sizeof(buffer), "Created %zu vertices\n", testMesh_.vertices.size());
-	OutputDebugStringA(buffer);
-
+	// Pyramid faces
 	// Front face
 	testMesh_.indices.push_back(0);
-	testMesh_.indices.push_back(1);
 	testMesh_.indices.push_back(2);
+	testMesh_.indices.push_back(1);
 
 	// Right face
 	testMesh_.indices.push_back(0);
-	testMesh_.indices.push_back(2);
 	testMesh_.indices.push_back(3);
+	testMesh_.indices.push_back(2);
 
 	// Back face
 	testMesh_.indices.push_back(0);
-	testMesh_.indices.push_back(3);
 	testMesh_.indices.push_back(4);
+	testMesh_.indices.push_back(3);
 
 	// Left face
 	testMesh_.indices.push_back(0);
-	testMesh_.indices.push_back(4);
 	testMesh_.indices.push_back(1);
-
-	// Bottom face
-	testMesh_.indices.push_back(1);
-	testMesh_.indices.push_back(2);
-	testMesh_.indices.push_back(3);
-
-	testMesh_.indices.push_back(1);
-	testMesh_.indices.push_back(3);
 	testMesh_.indices.push_back(4);
 
-	sprintf_s(buffer, sizeof(buffer), "Created %zu indices\n", testMesh_.indices.size());
-	OutputDebugStringA(buffer);
+	// NOTE: Bottom face intentionally not rendered - sits on floor plane
+
+	// Add floor plane at Y=1.0f (same as pyramid base)
+	// Dark green grass color (0.2, 0.5, 0.2)
+	int floorStartIdx = testMesh_.vertices.size();
+	testMesh_.vertices.push_back(Vertex{Vec3(-3.0f, 1.0f, -3.0f), Vec3(0.2f, 0.5f, 0.2f)});  // Back-left
+	testMesh_.vertices.push_back(Vertex{Vec3(3.0f, 1.0f, -3.0f), Vec3(0.2f, 0.5f, 0.2f)});   // Back-right
+	testMesh_.vertices.push_back(Vertex{Vec3(3.0f, 1.0f, 3.0f), Vec3(0.2f, 0.5f, 0.2f)});    // Front-right
+	testMesh_.vertices.push_back(Vertex{Vec3(-3.0f, 1.0f, 3.0f), Vec3(0.2f, 0.5f, 0.2f)});   // Front-left
+
+	// Floor triangles (2 triangles to make a quad)
+	// Triangle 1
+	testMesh_.indices.push_back(floorStartIdx + 0);
+	testMesh_.indices.push_back(floorStartIdx + 1);
+	testMesh_.indices.push_back(floorStartIdx + 2);
+
+	// Triangle 2
+	testMesh_.indices.push_back(floorStartIdx + 0);
+	testMesh_.indices.push_back(floorStartIdx + 2);
+	testMesh_.indices.push_back(floorStartIdx + 3);
 
 	// Position camera
-	getRenderer()->getCamera()->setPosition(Bound::Vec3(0.0f, 0.0f, 5.0f));
+	getRenderer()->getCamera()->setPosition(Vec3(0.0f, 0.5f, 3.0f));
 	
-	OutputDebugStringA("=== initializeMesh() complete ===\n");
+	OutputDebugStringA("=== Mesh initialized ===\n");
 }
 
 void Game::onUpdate(float deltaTime) {
@@ -72,18 +86,22 @@ void Game::onUpdate(float deltaTime) {
 }
 
 void Game::onRender() {
-	// Initialize mesh on first render
-	initializeMesh();
+	// Initialize on first render
+	if (!meshInitialized_) {
+		initializeMesh();
+	}
 	
-	// First, draw a test rectangle to verify rendering works
-	getFramebuffer()->drawRect(100, 100, 400, 400, Bound::Framebuffer::makeColor(255, 0, 0), true);
-	
-	// Then render the test mesh
-	getRenderer()->drawMesh(testMesh_, Bound::Mat4::identity());
+	// Render pyramid and floor
+	getFramebuffer()->drawRect(100, 100, 400, 400, Framebuffer::makeColor(255, 0, 0), true);
+	getRenderer()->drawMesh(testMesh_, Mat4::identity());
 }
 
 void Game::onShutdown() {
 	// Cleanup
+	if (world_) {
+		delete world_;
+		world_ = nullptr;
+	}
 }
 
 int main(int argc, char* argv[]) {

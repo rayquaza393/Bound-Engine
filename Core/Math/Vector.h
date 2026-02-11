@@ -3,6 +3,10 @@
 #include <cmath>
 #include <algorithm>
 
+// Undefine min/max macros that may be defined by windows.h or other headers
+#undef min
+#undef max
+
 namespace Bound {
 
 	// Simple 2D vector
