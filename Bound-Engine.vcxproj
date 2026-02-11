@@ -124,6 +124,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\Application.cpp" />
+    <ClCompile Include="Core\Editor\Editor.cpp" />
+    <ClCompile Include="Core\Editor\EditorObject.cpp" />
     <ClCompile Include="Core\Game\Level.cpp" />
     <ClCompile Include="Core\Game\World.cpp" />
     <ClCompile Include="Core\Render\Camera.cpp" />
@@ -134,6 +136,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Application.h" />
+    <ClInclude Include="Core\Editor\Editor.h" />
+    <ClInclude Include="Core\Editor\EditorObject.h" />
     <ClInclude Include="Core\Game\Level.h" />
     <ClInclude Include="Core\Game\World.h" />
     <ClInclude Include="Core\Math\Geometry.h" />
@@ -148,6 +152,7 @@
     <None Include="ARCHITECTURE.md" />
     <None Include="COMPLETION_SUMMARY.md" />
     <None Include="DEPENDENCIES.md" />
+    <None Include="EDITOR.md" />
     <None Include="FILE_MANIFEST.md" />
     <None Include="GETTING_STARTED.md" />
     <None Include="IMPLEMENTATION.md" />

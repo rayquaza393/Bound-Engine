@@ -16,8 +16,6 @@ namespace Bound {
 
 		// Create renderer
 		renderer_ = new Renderer(framebuffer_);
-
-		onInit();
 	}
 
 	Application::~Application() {
@@ -29,7 +27,13 @@ namespace Bound {
 	}
 
 	void Application::run() {
-		while (isRunning_ && window_->isOpen()) {
+	static bool initialized = false;
+	if (!initialized) {
+	initialized = true;
+	onInit();  // Call onInit on first run
+	}
+
+	while (isRunning_ && window_->isOpen()) {
 			// Update window and input
 			window_->update();
 			updateInput();

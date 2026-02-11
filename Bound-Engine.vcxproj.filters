@@ -63,6 +63,12 @@
     <ClCompile Include="Core\Game\World.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Editor\EditorObject.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Editor\Editor.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -89,13 +95,19 @@
     <ClInclude Include="Core\Math\Geometry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Game\World.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\Game\Level.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Editor\EditorObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Editor\Editor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -114,5 +126,6 @@
     <None Include="DEPENDENCIES.md" />
     <None Include="packages.config" />
     <None Include="STRUCTURE.md" />
+    <None Include="EDITOR.md" />
   </ItemGroup>
 </Project>

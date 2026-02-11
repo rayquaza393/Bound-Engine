@@ -4,27 +4,42 @@
 
 using namespace Bound;
 
-Game::Game() : Application("Bound Engine", 1024, 768), world_(nullptr), meshInitialized_(false) {
+Game::Game() : Application("Bound Engine", 1280, 720), world_(nullptr), editor_(nullptr), meshInitialized_(false) {
 }
 
 Game::~Game() {
 }
 
 void Game::onInit() {
+	OutputDebugStringA("=== Game::onInit() CALLED ===\n");
+	
 	// Initialize world
 	world_ = new World();
+	OutputDebugStringA("World created\n");
 	
-	// Try to load a level from Assets/Levels/Level1.data
-	if (!world_->loadLevel("Assets/Levels/Level1.data")) {
-		OutputDebugStringA("No level file found - falling back to test pyramid\n");
-	}
+	// Initialize editor
+	OutputDebugStringA("Creating editor...\n");
+	editor_ = new Editor();
+	OutputDebugStringA("Editor created successfully\n");
+	
+	// Create default scene with pyramid + floor
+	OutputDebugStringA("About to call initializeMesh\n");
+	initializeMesh();
+	OutputDebugStringA("initializeMesh returned\n");
 }
 
 void Game::initializeMesh() {
-	if (meshInitialized_) return;
+	OutputDebugStringA("=== initializeMesh() called ===\n");
+	
+	if (meshInitialized_) {
+		OutputDebugStringA("Already initialized, returning\n");
+		return;
+	}
+	
+	OutputDebugStringA("Setting meshInitialized_ = true\n");
 	meshInitialized_ = true;
 	
-	OutputDebugStringA("=== Creating pyramid and floor ===\n");
+	OutputDebugStringA("Adding pyramid vertices...\n");
 	
 	// Create pyramid mesh - single color (white)
 	testMesh_.vertices.push_back(Vertex{Vec3(0.0f, -1.0f, 0.0f), Vec3(1.0f, 1.0f, 1.0f)});      // Top
@@ -32,6 +47,8 @@ void Game::initializeMesh() {
 	testMesh_.vertices.push_back(Vertex{Vec3(1.0f, 1.0f, 1.0f), Vec3(1.0f, 1.0f, 1.0f)});     // Front-right
 	testMesh_.vertices.push_back(Vertex{Vec3(1.0f, 1.0f, -1.0f), Vec3(1.0f, 1.0f, 1.0f)});    // Back-right
 	testMesh_.vertices.push_back(Vertex{Vec3(-1.0f, 1.0f, -1.0f), Vec3(1.0f, 1.0f, 1.0f)});   // Back-left
+
+	OutputDebugStringA("Adding pyramid indices...\n");
 
 	// Pyramid faces
 	// Front face
@@ -54,7 +71,7 @@ void Game::initializeMesh() {
 	testMesh_.indices.push_back(1);
 	testMesh_.indices.push_back(4);
 
-	// NOTE: Bottom face intentionally not rendered - sits on floor plane
+	OutputDebugStringA("Adding floor vertices...\n");
 
 	// Add floor plane at Y=1.0f (same as pyramid base)
 	// Dark green grass color (0.2, 0.5, 0.2)
@@ -63,6 +80,8 @@ void Game::initializeMesh() {
 	testMesh_.vertices.push_back(Vertex{Vec3(3.0f, 1.0f, -3.0f), Vec3(0.2f, 0.5f, 0.2f)});   // Back-right
 	testMesh_.vertices.push_back(Vertex{Vec3(3.0f, 1.0f, 3.0f), Vec3(0.2f, 0.5f, 0.2f)});    // Front-right
 	testMesh_.vertices.push_back(Vertex{Vec3(-3.0f, 1.0f, 3.0f), Vec3(0.2f, 0.5f, 0.2f)});   // Front-left
+
+	OutputDebugStringA("Adding floor indices...\n");
 
 	// Floor triangles (2 triangles to make a quad)
 	// Triangle 1
@@ -75,23 +94,39 @@ void Game::initializeMesh() {
 	testMesh_.indices.push_back(floorStartIdx + 2);
 	testMesh_.indices.push_back(floorStartIdx + 3);
 
+	char buffer[256];
+	sprintf_s(buffer, sizeof(buffer), "Mesh complete: %zu vertices, %zu indices\n", 
+		testMesh_.vertices.size(), testMesh_.indices.size());
+	OutputDebugStringA(buffer);
+
 	// Position camera
+	OutputDebugStringA("Setting camera position...\n");
 	getRenderer()->getCamera()->setPosition(Vec3(0.0f, 0.5f, 3.0f));
 	
-	OutputDebugStringA("=== Mesh initialized ===\n");
+	OutputDebugStringA("=== initializeMesh() complete ===\n");
 }
 
 void Game::onUpdate(float deltaTime) {
-	// Update game logic here
+	// Toggle editor mode with Tab
+	static bool tabPressed = false;
+	if (getWindow()->isKeyPressed(VK_TAB)) {
+		if (!tabPressed) {
+			if (editor_) {
+				editor_->toggleActive();
+				const char* mode = editor_->isActive() ? "EDITOR" : "PLAY";
+				char buffer[256];
+				sprintf_s(buffer, sizeof(buffer), "=== Switched to %s mode ===\n", mode);
+				OutputDebugStringA(buffer);
+			}
+			tabPressed = true;
+		}
+	} else {
+		tabPressed = false;
+	}
 }
 
 void Game::onRender() {
-	// Initialize on first render
-	if (!meshInitialized_) {
-		initializeMesh();
-	}
-	
-	// Render pyramid and floor
+	// Render game pyramid and floor
 	getFramebuffer()->drawRect(100, 100, 400, 400, Framebuffer::makeColor(255, 0, 0), true);
 	getRenderer()->drawMesh(testMesh_, Mat4::identity());
 }
@@ -101,6 +136,10 @@ void Game::onShutdown() {
 	if (world_) {
 		delete world_;
 		world_ = nullptr;
+	}
+	if (editor_) {
+		delete editor_;
+		editor_ = nullptr;
 	}
 }
 

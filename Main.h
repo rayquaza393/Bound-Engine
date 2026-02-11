@@ -3,6 +3,7 @@
 #include "Core/Application.h"
 #include "Core/Game/World.h"
 #include "Core/Math/Geometry.h"
+#include "Core/Editor/Editor.h"
 
 using namespace Bound;
 
@@ -19,6 +20,7 @@ protected:
 
 private:
 	World* world_;
+	Editor* editor_;
 	Mesh testMesh_;
 	bool meshInitialized_;
 	
