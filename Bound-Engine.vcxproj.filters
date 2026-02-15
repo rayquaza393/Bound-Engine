@@ -19,9 +19,6 @@
     <Filter Include="Core\Render">
       <UniqueIdentifier>{443c92be-a0e6-40b5-888a-f3c5ca36a519}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\FrameBuffer">
-      <UniqueIdentifier>{f9e4809e-05b4-43c2-8830-22029fc7bf99}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Game">
       <UniqueIdentifier>{390794bf-3b9f-472e-9e7e-379af6e1e963}</UniqueIdentifier>
     </Filter>
@@ -40,64 +37,64 @@
     <Filter Include="Core\Assets\Levels">
       <UniqueIdentifier>{d24a0d48-df70-44ab-9544-636be4c6fb33}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Documentation">
+      <UniqueIdentifier>{57e1d65b-2a1d-42c8-9c37-89055c2c3af6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Render\Camera.cpp">
       <Filter>Core\Render</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Game\Level.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Game\World.cpp">
-      <Filter>Core</Filter>
+    <ClCompile Include="Core\Editor\Editor.cpp">
+      <Filter>Core\Tools</Filter>
     </ClCompile>
     <ClCompile Include="Core\Editor\EditorObject.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Editor\Editor.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Platform\SDLWindow.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Render\Mesh.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Render\Shader.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Render\GLRenderer.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\GLApplication.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Assets\AssetManager.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Assets\MeshLibrary.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Serialization\LevelFormat.cpp">
-      <Filter>Core</Filter>
+      <Filter>Core\Tools</Filter>
     </ClCompile>
     <ClCompile Include="Core\Assets\AssetDatabase.cpp">
-      <Filter>Core</Filter>
+      <Filter>Core\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Assets\MeshLibraryImpl.cpp">
-      <Filter>Core</Filter>
+    <ClCompile Include="Core\Assets\AssetManager.cpp">
+      <Filter>Core\Assets</Filter>
     </ClCompile>
     <ClCompile Include="Core\Assets\AssetManagerImpl.cpp">
-      <Filter>Core</Filter>
+      <Filter>Core\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GLApplication.cpp">
+      <Filter>Core\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Render\GLRenderer.cpp">
+      <Filter>Core\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Serialization\LevelFormat.cpp">
+      <Filter>Core\Assets\Levels</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Game\Level.cpp">
+      <Filter>Core\Assets\Levels</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">
-      <Filter>Core</Filter>
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Render\Mesh.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Assets\MeshLibrary.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Assets\MeshLibraryImpl.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Game\World.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\SDLWindow.cpp">
+      <Filter>Core\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Render\Shader.cpp">
+      <Filter>Core\Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\Render\Camera.h">
-      <Filter>Core\Render</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Math\Vector.h">
       <Filter>Core\Math</Filter>
     </ClInclude>
@@ -143,25 +140,64 @@
     <ClInclude Include="Main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Render\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="README.md" />
-    <None Include="QUICKSTART.md" />
-    <None Include="ROADMAP.md" />
-    <None Include="SETUP_COMPLETE.md" />
-    <None Include="ARCHITECTURE.md" />
-    <None Include="FILE_MANIFEST.md" />
-    <None Include="GETTING_STARTED.md" />
-    <None Include="IMPLEMENTATION.md" />
-    <None Include="INDEX.md" />
-    <None Include="COMPLETION_SUMMARY.md" />
-    <None Include="PROJECT_REPORT.md" />
-    <None Include="DEPENDENCIES.md" />
-    <None Include="packages.config" />
-    <None Include="STRUCTURE.md" />
-    <None Include="EDITOR.md" />
-    <None Include="PROJECT_SCOPE.md" />
-    <None Include="TESTING_FRAMEWORK.md" />
-    <None Include="CONTRIBUTING.md" />
+    <None Include="ARCHITECTURE.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="COMPLETION_SUMMARY.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="CONTRIBUTING.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="DEPENDENCIES.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="EDITOR.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="FILE_MANIFEST.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="GETTING_STARTED.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="IMPLEMENTATION.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="INDEX.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="packages.config">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="PROJECT_REPORT.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="PROJECT_SCOPE.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="QUICKSTART.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="README.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="ROADMAP.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="SETUP_COMPLETE.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="STRUCTURE.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="TESTING_FRAMEWORK.md">
+      <Filter>Documentation</Filter>
+    </None>
   </ItemGroup>
 </Project>
