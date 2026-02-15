@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace Bound {
 
@@ -82,6 +83,24 @@ namespace Bound {
 
 		// Clamp pitch to avoid gimbal lock
 		pitch_ = clamp(pitch_, radians(-89.0f), radians(89.0f));
+	}
+
+	// GLM versions for GPU rendering
+	glm::mat4 Camera::getGLMViewMatrix() const {
+		glm::vec3 pos(position_.x, position_.y, position_.z);
+		Vec3 forward = getForward();
+		Vec3 up = getUp();
+		glm::vec3 center = pos + glm::vec3(forward.x, forward.y, forward.z);
+		return glm::lookAt(pos, center, glm::vec3(up.x, up.y, up.z));
+	}
+
+	glm::mat4 Camera::getGLMProjectionMatrix() const {
+		return glm::perspective(
+			fov_,
+			aspect_,
+			nearPlane_,
+			farPlane_
+		);
 	}
 
 }

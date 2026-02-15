@@ -42,20 +42,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Core\Render\Renderer.cpp">
-      <Filter>Core\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="Platform\Window.cpp">
-      <Filter>Core\FrameBuffer</Filter>
-    </ClCompile>
     <ClCompile Include="Core\Render\Camera.cpp">
       <Filter>Core\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Render\Framebuffer.cpp">
-      <Filter>Core\FrameBuffer</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Application.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\Game\Level.cpp">
       <Filter>Core</Filter>
@@ -69,23 +57,44 @@
     <ClCompile Include="Core\Editor\Editor.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Platform\SDLWindow.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Render\Mesh.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Render\Shader.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Render\GLRenderer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GLApplication.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Assets\AssetManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Assets\MeshLibrary.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Serialization\LevelFormat.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Assets\AssetDatabase.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Assets\MeshLibraryImpl.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Assets\AssetManagerImpl.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\Render\Framebuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Application.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Platform\Window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Render\Renderer.h">
-      <Filter>Core\Render</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Render\Camera.h">
       <Filter>Core\Render</Filter>
     </ClInclude>
@@ -105,6 +114,30 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\Editor\Editor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\SDLWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Render\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Render\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Render\GLRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GLApplication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Serialization\LevelFormat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Assets\MeshLibrary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Assets\AssetManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Main.h">
@@ -127,5 +160,8 @@
     <None Include="packages.config" />
     <None Include="STRUCTURE.md" />
     <None Include="EDITOR.md" />
+    <None Include="PROJECT_SCOPE.md" />
+    <None Include="TESTING_FRAMEWORK.md" />
+    <None Include="CONTRIBUTING.md" />
   </ItemGroup>
 </Project>

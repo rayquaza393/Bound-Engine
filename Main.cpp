@@ -1,146 +1,75 @@
 #include "Main.h"
-#include <windows.h>
+#include "Core/Render/GLRenderer.h"
+#include <glm/glm.hpp>
 #include <cstdio>
 
 using namespace Bound;
 
-Game::Game() : Application("Bound Engine", 1280, 720), world_(nullptr), editor_(nullptr), meshInitialized_(false) {
+Game::Game() : GLApplication("Bound Engine - OpenGL", 1280, 720) {
 }
 
 Game::~Game() {
 }
 
 void Game::onInit() {
-	OutputDebugStringA("=== Game::onInit() CALLED ===\n");
+	printf("=== Game::onInit() ===\n");
+	
+	// Initialize asset manager (loads from Assets/ folder)
+	assetManager_ = std::make_unique<AssetManager>("Assets/");
 	
 	// Initialize world
-	world_ = new World();
-	OutputDebugStringA("World created\n");
+	world_ = std::make_unique<World>();
+	printf("World created\n");
 	
-	// Initialize editor
-	OutputDebugStringA("Creating editor...\n");
-	editor_ = new Editor();
-	OutputDebugStringA("Editor created successfully\n");
+	// Load scene from file or create default
+	loadScene();
+	printf("Scene loaded\n");
 	
-	// Create default scene with pyramid + floor
-	OutputDebugStringA("About to call initializeMesh\n");
-	initializeMesh();
-	OutputDebugStringA("initializeMesh returned\n");
+	// Set camera position
+	getRenderer()->getCamera()->setPosition(Vec3(0.0f, 0.5f, 3.0f));
 }
 
-void Game::initializeMesh() {
-	OutputDebugStringA("=== initializeMesh() called ===\n");
+void Game::loadScene() {
+	// For now, create scene from primitives
+	// Later: Load from Assets/Levels/defaultLevel.level
 	
-	if (meshInitialized_) {
-		OutputDebugStringA("Already initialized, returning\n");
-		return;
+	printf("Creating scene from primitives...\n");
+
+	// Create pyramid
+	testMesh_ = assetManager_->getMeshLibrary().createPyramid(2.0f);
+	MeshLibrary::colorMesh(testMesh_, glm::vec3(1.0f, 1.0f, 1.0f));
+
+	// Add floor plane
+	Mesh floorMesh = assetManager_->getMeshLibrary().createPlane(10.0f, 10.0f);
+	MeshLibrary::colorMesh(floorMesh, glm::vec3(0.2f, 0.5f, 0.2f));
+	
+	// Combine for now (later: render separately with transforms)
+	uint32_t vertexOffset = testMesh_.vertices.size();
+	for (const auto& vertex : floorMesh.vertices) {
+		Vertex v = vertex;
+		v.position.y = -2.0f;  // Move floor down
+		testMesh_.vertices.push_back(v);
 	}
-	
-	OutputDebugStringA("Setting meshInitialized_ = true\n");
-	meshInitialized_ = true;
-	
-	OutputDebugStringA("Adding pyramid vertices...\n");
-	
-	// Create pyramid mesh - single color (white)
-	testMesh_.vertices.push_back(Vertex{Vec3(0.0f, -1.0f, 0.0f), Vec3(1.0f, 1.0f, 1.0f)});      // Top
-	testMesh_.vertices.push_back(Vertex{Vec3(-1.0f, 1.0f, 1.0f), Vec3(1.0f, 1.0f, 1.0f)});    // Front-left
-	testMesh_.vertices.push_back(Vertex{Vec3(1.0f, 1.0f, 1.0f), Vec3(1.0f, 1.0f, 1.0f)});     // Front-right
-	testMesh_.vertices.push_back(Vertex{Vec3(1.0f, 1.0f, -1.0f), Vec3(1.0f, 1.0f, 1.0f)});    // Back-right
-	testMesh_.vertices.push_back(Vertex{Vec3(-1.0f, 1.0f, -1.0f), Vec3(1.0f, 1.0f, 1.0f)});   // Back-left
+	for (uint32_t idx : floorMesh.indices) {
+		testMesh_.indices.push_back(idx + vertexOffset);
+	}
 
-	OutputDebugStringA("Adding pyramid indices...\n");
-
-	// Pyramid faces
-	// Front face
-	testMesh_.indices.push_back(0);
-	testMesh_.indices.push_back(2);
-	testMesh_.indices.push_back(1);
-
-	// Right face
-	testMesh_.indices.push_back(0);
-	testMesh_.indices.push_back(3);
-	testMesh_.indices.push_back(2);
-
-	// Back face
-	testMesh_.indices.push_back(0);
-	testMesh_.indices.push_back(4);
-	testMesh_.indices.push_back(3);
-
-	// Left face
-	testMesh_.indices.push_back(0);
-	testMesh_.indices.push_back(1);
-	testMesh_.indices.push_back(4);
-
-	OutputDebugStringA("Adding floor vertices...\n");
-
-	// Add floor plane at Y=1.0f (same as pyramid base)
-	// Dark green grass color (0.2, 0.5, 0.2)
-	int floorStartIdx = testMesh_.vertices.size();
-	testMesh_.vertices.push_back(Vertex{Vec3(-3.0f, 1.0f, -3.0f), Vec3(0.2f, 0.5f, 0.2f)});  // Back-left
-	testMesh_.vertices.push_back(Vertex{Vec3(3.0f, 1.0f, -3.0f), Vec3(0.2f, 0.5f, 0.2f)});   // Back-right
-	testMesh_.vertices.push_back(Vertex{Vec3(3.0f, 1.0f, 3.0f), Vec3(0.2f, 0.5f, 0.2f)});    // Front-right
-	testMesh_.vertices.push_back(Vertex{Vec3(-3.0f, 1.0f, 3.0f), Vec3(0.2f, 0.5f, 0.2f)});   // Front-left
-
-	OutputDebugStringA("Adding floor indices...\n");
-
-	// Floor triangles (2 triangles to make a quad)
-	// Triangle 1
-	testMesh_.indices.push_back(floorStartIdx + 0);
-	testMesh_.indices.push_back(floorStartIdx + 1);
-	testMesh_.indices.push_back(floorStartIdx + 2);
-
-	// Triangle 2
-	testMesh_.indices.push_back(floorStartIdx + 0);
-	testMesh_.indices.push_back(floorStartIdx + 2);
-	testMesh_.indices.push_back(floorStartIdx + 3);
-
-	char buffer[256];
-	sprintf_s(buffer, sizeof(buffer), "Mesh complete: %zu vertices, %zu indices\n", 
-		testMesh_.vertices.size(), testMesh_.indices.size());
-	OutputDebugStringA(buffer);
-
-	// Position camera
-	OutputDebugStringA("Setting camera position...\n");
-	getRenderer()->getCamera()->setPosition(Vec3(0.0f, 0.5f, 3.0f));
-	
-	OutputDebugStringA("=== initializeMesh() complete ===\n");
+	testMesh_.gpuDirty = true;
+	printf("Scene ready: %zu vertices, %zu indices\n", testMesh_.vertices.size(), testMesh_.indices.size());
 }
 
 void Game::onUpdate(float deltaTime) {
-	// Toggle editor mode with Tab
-	static bool tabPressed = false;
-	if (getWindow()->isKeyPressed(VK_TAB)) {
-		if (!tabPressed) {
-			if (editor_) {
-				editor_->toggleActive();
-				const char* mode = editor_->isActive() ? "EDITOR" : "PLAY";
-				char buffer[256];
-				sprintf_s(buffer, sizeof(buffer), "=== Switched to %s mode ===\n", mode);
-				OutputDebugStringA(buffer);
-			}
-			tabPressed = true;
-		}
-	} else {
-		tabPressed = false;
-	}
+	// Game logic
 }
 
 void Game::onRender() {
-	// Render game pyramid and floor
-	getFramebuffer()->drawRect(100, 100, 400, 400, Framebuffer::makeColor(255, 0, 0), true);
-	getRenderer()->drawMesh(testMesh_, Mat4::identity());
+	// Render test mesh
+	getRenderer()->drawMesh(testMesh_, glm::mat4(1.0f));
 }
 
 void Game::onShutdown() {
-	// Cleanup
-	if (world_) {
-		delete world_;
-		world_ = nullptr;
-	}
-	if (editor_) {
-		delete editor_;
-		editor_ = nullptr;
-	}
+	world_.reset();
+	assetManager_.reset();
 }
 
 int main(int argc, char* argv[]) {

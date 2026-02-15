@@ -1,103 +1,219 @@
-# Bound Engine - Foundation Architecture
+# Bound Engine v2.1 - Foundation Architecture
 
-A lightweight, CPU-focused 3D game engine emphasizing efficiency and compatibility.
+A lightweight, CPU-focused 3D game engine emphasizing efficiency and compatibility, specifically designed for proprietary MMO development with **clear CPU/GPU separation**: the GPU handles rendering, while the CPU manages world orchestration, AI, navigation, and physics.
 
-## Project Structure
+**Current Focus**: Modular testing framework, v2.1 (SDL2 + OpenGL)
 
-```
+---
+
+## ?? Quick Links
+
+- **[PROJECT_SCOPE.md](./PROJECT_SCOPE.md)** - Full architecture, roadmap, and design principles
+- **[TESTING_FRAMEWORK.md](./TESTING_FRAMEWORK.md)** - Modular test system design and implementation
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - Development guidelines and code standards
+- **[EDITOR.md](./EDITOR.md)** - In-engine editor documentation
+
+---
+
+## ?? What is Bound-Engine?
+
+Bound-Engine is a **proprietary game engine** designed specifically for MMO development with:
+
+- **OpenGL Rendering**: Lightweight GPU-focused rendering pipeline
+- **World Orchestration**: CPU-driven entity management, AI, pathfinding
+- **Server Integration**: Custom C++ API for connecting to proprietary MMO server
+- **Lean Philosophy**: No bloat, only features needed for production gameplay
+- **Cross-Platform**: SDL2 support for Windows, Linux, macOS
+
+### Architecture at a Glance
+
+Rendering (GPU)          World Sim (CPU)           Platform (SDL2)
+?? OpenGL               ?? Entities              ?? Window
+?? Shaders              ?? AI/Pathfinding        ?? Input
+?? Meshes               ?? Physics               ?? Cross-platform
+?? Camera               ?? Server Sync
+                        ?? Level Management
+
+---
+
+## ??? Project Structure
+
 Bound-Engine/
 ??? Core/
-?   ??? Math/
-?   ?   ??? Vector.h          # Vec2, Vec3, Vec4, Mat4 math types
-?   ??? Render/
-?   ?   ??? Framebuffer.h/.cpp    # Pixel buffer and rendering target
-?   ?   ??? Camera.h/.cpp         # 3D camera with view/projection matrices
-?   ?   ??? Renderer.h/.cpp       # Main rendering system
-?   ??? Application.h/.cpp        # Main engine application class
-??? Platform/
-?   ??? Window.h/.cpp             # Windows windowing system
-??? Main.h/.cpp                   # Game entry point (example)
-??? [project files]
-```
+?   ??? Render/          # OpenGL rendering pipeline
+?   ??? Game/            # Entity, World, Level management
+?   ??? Assets/          # Asset loading & caching
+?   ??? Editor/          # In-engine editor (ImGui)
+?   ??? Serialization/   # Level format I/O
+?   ??? Math/            # Vector, matrix, geometry
+?
+??? Platform/            # SDL2 window & input abstraction
+??? Tests/               # Modular test framework
+?   ??? RenderTests/
+?   ??? AssetTests/
+?   ??? SimulationTests/
+?   ??? IntegrationTests/
+?
+??? Assets/              # Game content (models, textures, shaders, levels)
+??? Main.cpp/.h          # Game entry point
+?
+??? Documentation/
+    ??? PROJECT_SCOPE.md         # This document
+    ??? TESTING_FRAMEWORK.md     # Test system design
+    ??? CONTRIBUTING.md          # Code standards
+    ??? EDITOR.md                # Editor guide
 
-## Current Status
+---
 
-? **Completed:**
-- Core math library (Vec3, Mat4, basic transforms)
-- Framebuffer (2D pixel buffer with depth testing)
-- Camera system (FPS-style with yaw/pitch)
-- Basic renderer (mesh rendering, world-to-screen transform)
-- Windows platform integration
-- Main application loop with input handling
-- Test pyramid mesh
+## ?? Getting Started
 
-## Building & Running
+### Prerequisites
+- C++14 or later
+- SDL2 (already in `packages.config`)
+- OpenGL 4.5+
+- CMake 3.16+ (or Visual Studio 2022)
 
-The project compiles with C++14 on Windows. The test application creates a 1920x1080 window and renders a colored pyramid.
+### Building
 
-**Controls:**
-- **WASD** - Camera movement (forward/back/strafe)
-- **Space/Ctrl** - Camera up/down
-- **Right Mouse Button** - Look around (mouse look)
-- **ESC** - Quit
+# Using Visual Studio
+# Open Bound-Engine.sln and build
 
-## Next Steps
+# Using CMake (future)
+mkdir build && cd build
+cmake ..
+cmake --build .
 
-### Immediate Priorities:
-1. **Triangle Rasterization** - Implement proper filled triangle rendering with barycentric interpolation
-2. **Texture Support** - Add texture mapping and UV coordinates to meshes
-3. **Mesh Loading** - Import OBJ/FBX files for game content
-4. **Scene Manager** - Organize objects in a scene graph with culling
-5. **Input Manager** - Abstract input for cross-platform support
+### Running Tests
 
-### Medium-term:
-1. **Lighting System** - Implement Gouraud shading with point lights
-2. **LOD System** - Distance-based geometry simplification
-3. **Fog Effects** - Distance-based dithering and chromatic aberration
-4. **Asset Manager** - Load/cache meshes and textures
+# Run all tests
+./TestRunner.exe ./Tests
 
-### Platform Support:
-- [ ] Windows (Current - basic implementation)
-- [ ] Linux (Unix/X11 windowing)
-- [ ] macOS (Cocoa windowing)
+# Run specific suite
+./TestRunner.exe ./Tests/RenderTests
 
-### Editor Integration:
-- [ ] Dear ImGui integration
-- [ ] Scene hierarchy panel
-- [ ] Property inspector
-- [ ] Viewport rendering
+### Running Game
 
-## Architecture Notes
+./Bound-Engine.exe
 
-**Bound::Application** - Base class for creating games. Override `onInit()`, `onUpdate()`, `onRender()`, and `onShutdown()` to implement game logic.
 
-**Bound::Framebuffer** - Represents the 2D target surface. Currently 32-bit ARGB, supports depth buffer for Z-ordering.
+---
 
-**Bound::Renderer** - Takes 3D scene data and projects it to the framebuffer. Currently renders triangle outlines.
+## ?? Current Status (v2.1)
 
-**Bound::Camera** - FPS-style camera with perspective projection. Handles view matrix generation and camera movement.
+### ? Completed
+- [x] SDL2 + OpenGL integration
+- [x] Basic mesh rendering
+- [x] Camera system (FPS-style)
+- [x] Asset manager framework
+- [x] World & Level containers
+- [x] Shader compilation & management
+- [x] Math library (Vec3, Mat4, etc.)
 
-**Math Types** - Minimal custom math library optimized for game use. Can be extended or replaced with GLM later.
+### ??? In Progress
+- [ ] **Modular test framework** (active)
+- [ ] Entity component system
+- [ ] Level serialization
+- [ ] Mesh import (OBJ/FBX)
 
-## Notes for Future Development
+### ?? Planned (v2.2+)
+- [ ] Physics system (AABB, raycasts)
+- [ ] Pathfinding (A*, navigation mesh)
+- [ ] In-engine editor (ImGui integration)
+- [ ] Texture support & material system
+- [ ] LOD & frustum culling
+- [ ] Server integration protocol
 
-- The engine uses Windows-specific windowing currently. Abstract to platform-agnostic interface before Linux/Mac support.
-- Triangle rasterization is stubbed but needs proper edge-walking and barycentric interpolation.
-- Fog effects and post-processing pipeline are outlined but not implemented.
-- Depth buffer uses 16-bit values; consider 32-bit float for better precision in complex scenes.
-- Lighting and shading are core to the "pseudo-3D" aesthetic - Gouraud shading with aggressive LOD is the target.
+---
 
-## File Manifest
+## ?? Game Loop
 
-| File | Purpose |
-|------|---------|
-| Core/Math/Vector.h | Vec2, Vec3, Vec4, Mat4 with operators and transforms |
-| Core/Render/Framebuffer.h/.cpp | Pixel buffer, depth test, drawing primitives |
-| Core/Render/Camera.h/.cpp | 3D camera with view/projection matrices |
-| Core/Render/Renderer.h/.cpp | Main rendering pipeline |
-| Core/Application.h/.cpp | Engine main loop and game base class |
-| Platform/Window.h/.cpp | Windows windowing and input |
-| Main.h/.cpp | Game example with test pyramid mesh |
+Main Loop (locked to 60 FPS):
+  1. Poll input (SDL2)
+  2. Update game logic (CPU)
+  3. Update AI/physics
+  4. Render to backbuffer (GPU)
+  5. Present frame
+
+The engine uses **double buffering** with VSync to maintain smooth 60 FPS gameplay.
+
+---
+
+## ?? Server Integration
+
+Bound-Engine connects to a proprietary C++ MMO server via a custom API:
+
+Server ? Updates (entity state, ability results) ? Client
+Client ? Commands (movement, actions) ? Server (validated)
+
+See `PROJECT_SCOPE.md` for detailed data flow diagrams.
+
+---
+
+## ?? Key Systems
+
+| System | Location | Purpose |
+|--------|----------|---------|
+| **GLRenderer** | `Core/Render/` | Main OpenGL rendering pipeline |
+| **AssetManager** | `Core/Assets/` | Load/cache meshes, textures, shaders |
+| **World** | `Core/Game/` | Entity container and spatial organization |
+| **Camera** | `Core/Render/` | View matrix, perspective projection |
+| **Shader** | `Core/Render/` | GLSL compilation, uniform management |
+| **SDLWindow** | `Platform/` | Cross-platform window & input |
+
+---
+
+## ?? Testing
+
+The engine uses a **modular test framework** that loads test assets and configurations from files, not hardcoded:
+
+Tests/
+??? RenderTests/
+?   ??? testmanifest.json
+?   ??? test_assets/
+?   ??? expected_outputs/
+??? AssetTests/
+??? SimulationTests/
+??? IntegrationTests/
+
+Each test suite is independent and configurable. See **TESTING_FRAMEWORK.md** for complete design.
+
+---
+
+## ??? Development Guidelines
+
+- **Code Style**: See `.editorconfig` and `CONTRIBUTING.md`
+- **Namespaces**: `Bound::` prefix for all engine code
+- **Memory**: Prefer `std::unique_ptr` for RAII
+- **Threading**: CPU/GPU work should be decoupled (no blocking GPU calls from CPU)
+
+---
+
+## ?? Documentation
+
+- **[PROJECT_SCOPE.md](./PROJECT_SCOPE.md)** - Full architecture, design goals, roadmap
+- **[TESTING_FRAMEWORK.md](./TESTING_FRAMEWORK.md)** - Test system implementation guide
+- **[EDITOR.md](./EDITOR.md)** - Editor features and usage
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - Code standards and contribution process
+
+---
+
+## ?? License
+
+Proprietary - Bound-Engine is custom-built for MMO development.
+
+---
+
+## ?? Team
+
+Built with a **lean and resourceful philosophy** by a small, focused team.
+
+For questions or contributions, see **CONTRIBUTING.md**.
+
+---
+
+**Last Updated**: February 15, 2026  
+**Version**: v2.1 (SDL2 + OpenGL)  
+**Target**: Proprietary MMO Server Integration
 
 ---
 

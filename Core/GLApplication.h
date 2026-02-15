@@ -1,15 +1,16 @@
 #pragma once
 
-#include "../Platform/Window.h"
-#include "Render/Framebuffer.h"
-#include "Render/Renderer.h"
+#include "../Platform/SDLWindow.h"
+#include "Render/GLRenderer.h"
+#include <memory>
+#include <cstdint>
 
 namespace Bound {
 
-	class Application {
+	class GLApplication {
 	public:
-		Application(const char* title, int width, int height);
-		~Application();
+		GLApplication(const char* title, int width, int height);
+		virtual ~GLApplication();
 
 		// Main loop
 		void run();
@@ -17,9 +18,8 @@ namespace Bound {
 		void quit() { isRunning_ = false; }
 
 		// Access to subsystems
-		Window* getWindow() { return window_; }
-		Framebuffer* getFramebuffer() { return framebuffer_; }
-		Renderer* getRenderer() { return renderer_; }
+		SDLWindow* getWindow() { return window_.get(); }
+		GLRenderer* getRenderer() { return renderer_.get(); }
 
 	protected:
 		// Virtual functions for subclasses to override
@@ -29,13 +29,11 @@ namespace Bound {
 		virtual void onShutdown() {}
 
 	private:
-		Window* window_;
-		Framebuffer* framebuffer_;
-		Renderer* renderer_;
+		std::unique_ptr<SDLWindow> window_;
+		std::unique_ptr<GLRenderer> renderer_;
 		bool isRunning_;
 
 		// Timing
-		uint64_t lastFrameTime_;
 		float deltaTime_;
 
 		void updateInput();

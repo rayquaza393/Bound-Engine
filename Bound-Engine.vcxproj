@@ -123,34 +123,46 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Core\Application.cpp" />
+    <ClCompile Include="Core\Assets\AssetDatabase.cpp" />
+    <ClCompile Include="Core\Assets\AssetManager.cpp" />
+    <ClCompile Include="Core\Assets\AssetManagerImpl.cpp" />
+    <ClCompile Include="Core\Assets\MeshLibrary.cpp" />
+    <ClCompile Include="Core\Assets\MeshLibraryImpl.cpp" />
     <ClCompile Include="Core\Editor\Editor.cpp" />
     <ClCompile Include="Core\Editor\EditorObject.cpp" />
     <ClCompile Include="Core\Game\Level.cpp" />
     <ClCompile Include="Core\Game\World.cpp" />
+    <ClCompile Include="Core\GLApplication.cpp" />
     <ClCompile Include="Core\Render\Camera.cpp" />
-    <ClCompile Include="Core\Render\Framebuffer.cpp" />
-    <ClCompile Include="Core\Render\Renderer.cpp" />
+    <ClCompile Include="Core\Render\GLRenderer.cpp" />
+    <ClCompile Include="Core\Render\Mesh.cpp" />
+    <ClCompile Include="Core\Render\Shader.cpp" />
+    <ClCompile Include="Core\Serialization\LevelFormat.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Platform\Window.cpp" />
+    <ClCompile Include="Platform\SDLWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\Application.h" />
+    <ClInclude Include="Core\Assets\AssetManager.h" />
+    <ClInclude Include="Core\Assets\MeshLibrary.h" />
     <ClInclude Include="Core\Editor\Editor.h" />
     <ClInclude Include="Core\Editor\EditorObject.h" />
     <ClInclude Include="Core\Game\Level.h" />
     <ClInclude Include="Core\Game\World.h" />
+    <ClInclude Include="Core\GLApplication.h" />
     <ClInclude Include="Core\Math\Geometry.h" />
     <ClInclude Include="Core\Math\Vector.h" />
     <ClInclude Include="Core\Render\Camera.h" />
-    <ClInclude Include="Core\Render\Framebuffer.h" />
-    <ClInclude Include="Core\Render\Renderer.h" />
+    <ClInclude Include="Core\Render\GLRenderer.h" />
+    <ClInclude Include="Core\Render\Mesh.h" />
+    <ClInclude Include="Core\Render\Shader.h" />
+    <ClInclude Include="Core\Serialization\LevelFormat.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="Platform\Window.h" />
+    <ClInclude Include="Platform\SDLWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ARCHITECTURE.md" />
     <None Include="COMPLETION_SUMMARY.md" />
+    <None Include="CONTRIBUTING.md" />
     <None Include="DEPENDENCIES.md" />
     <None Include="EDITOR.md" />
     <None Include="FILE_MANIFEST.md" />
@@ -159,11 +171,13 @@
     <None Include="INDEX.md" />
     <None Include="packages.config" />
     <None Include="PROJECT_REPORT.md" />
+    <None Include="PROJECT_SCOPE.md" />
     <None Include="QUICKSTART.md" />
     <None Include="README.md" />
     <None Include="ROADMAP.md" />
     <None Include="SETUP_COMPLETE.md" />
     <None Include="STRUCTURE.md" />
+    <None Include="TESTING_FRAMEWORK.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

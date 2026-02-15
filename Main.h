@@ -1,13 +1,14 @@
 #pragma once
 
-#include "Core/Application.h"
+#include "Core/GLApplication.h"
 #include "Core/Game/World.h"
-#include "Core/Math/Geometry.h"
-#include "Core/Editor/Editor.h"
+#include "Core/Render/Mesh.h"
+#include "Core/Assets/AssetManager.h"
+#include <memory>
 
 using namespace Bound;
 
-class Game : public Application {
+class Game : public GLApplication {
 public:
 	Game();
 	~Game();
@@ -19,10 +20,9 @@ protected:
 	void onShutdown() override;
 
 private:
-	World* world_;
-	Editor* editor_;
+	std::unique_ptr<World> world_;
+	std::unique_ptr<AssetManager> assetManager_;
 	Mesh testMesh_;
-	bool meshInitialized_;
 	
-	void initializeMesh();
+	void loadScene();
 };
