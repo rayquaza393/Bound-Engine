@@ -35,7 +35,7 @@ namespace Bound {
             uint32_t numVertices = chunk.vertices.size();
             file.write(reinterpret_cast<const char*>(&numVertices), sizeof(numVertices));
             file.write(reinterpret_cast<const char*>(chunk.vertices.data()), 
-                      numVertices * sizeof(Vertex));
+                      numVertices * sizeof(LevelVertex));
             
             // Indices
             uint32_t numIndices = chunk.indices.size();
@@ -84,7 +84,7 @@ namespace Bound {
             file.read(reinterpret_cast<char*>(&numVertices), sizeof(numVertices));
             chunk.vertices.resize(numVertices);
             file.read(reinterpret_cast<char*>(chunk.vertices.data()), 
-                     numVertices * sizeof(Vertex));
+                     numVertices * sizeof(LevelVertex));
             
             // Indices
             uint32_t numIndices;

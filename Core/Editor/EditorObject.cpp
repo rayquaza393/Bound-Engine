@@ -7,75 +7,51 @@ namespace Bound {
 		mesh.vertices.clear();
 		mesh.indices.clear();
 
+		glm::vec3 glmColor(color.x, color.y, color.z);
+
 		switch (type) {
 			case ObjectType::Cube:
-				// Simple cube: 8 vertices, 12 triangles (6 faces)
-				// Front face (z+)
-				mesh.vertices.push_back(Vertex{Vec3(-0.5f, -0.5f, 0.5f), color});   // 0
-				mesh.vertices.push_back(Vertex{Vec3(0.5f, -0.5f, 0.5f), color});    // 1
-				mesh.vertices.push_back(Vertex{Vec3(0.5f, 0.5f, 0.5f), color});     // 2
-				mesh.vertices.push_back(Vertex{Vec3(-0.5f, 0.5f, 0.5f), color});    // 3
+				// Simple cube: 8 vertices
+				mesh.vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glmColor));
+				mesh.vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glmColor));
+				mesh.vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glmColor));
+				mesh.vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glmColor));
+				mesh.vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glmColor));
+				mesh.vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glmColor));
+				mesh.vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glmColor));
+				mesh.vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, -0.5f), glmColor));
 
-				// Back face (z-)
-				mesh.vertices.push_back(Vertex{Vec3(0.5f, -0.5f, -0.5f), color});   // 4
-				mesh.vertices.push_back(Vertex{Vec3(-0.5f, -0.5f, -0.5f), color});  // 5
-				mesh.vertices.push_back(Vertex{Vec3(-0.5f, 0.5f, -0.5f), color});   // 6
-				mesh.vertices.push_back(Vertex{Vec3(0.5f, 0.5f, -0.5f), color});    // 7
-
-				// Front face
-				mesh.indices.push_back(0); mesh.indices.push_back(2); mesh.indices.push_back(1);
-				mesh.indices.push_back(0); mesh.indices.push_back(3); mesh.indices.push_back(2);
-
-				// Back face
-				mesh.indices.push_back(4); mesh.indices.push_back(6); mesh.indices.push_back(5);
-				mesh.indices.push_back(4); mesh.indices.push_back(7); mesh.indices.push_back(6);
-
-				// Left face
-				mesh.indices.push_back(5); mesh.indices.push_back(6); mesh.indices.push_back(3);
-				mesh.indices.push_back(5); mesh.indices.push_back(3); mesh.indices.push_back(0);
-
-				// Right face
-				mesh.indices.push_back(1); mesh.indices.push_back(2); mesh.indices.push_back(7);
-				mesh.indices.push_back(1); mesh.indices.push_back(7); mesh.indices.push_back(4);
-
-				// Top face
-				mesh.indices.push_back(3); mesh.indices.push_back(6); mesh.indices.push_back(7);
-				mesh.indices.push_back(3); mesh.indices.push_back(7); mesh.indices.push_back(2);
-
-				// Bottom face
-				mesh.indices.push_back(5); mesh.indices.push_back(0); mesh.indices.push_back(1);
-				mesh.indices.push_back(5); mesh.indices.push_back(1); mesh.indices.push_back(4);
+				mesh.indices = {
+					0, 2, 1, 0, 3, 2,
+					4, 6, 5, 4, 7, 6,
+					5, 6, 3, 5, 3, 0,
+					1, 2, 7, 1, 7, 4,
+					3, 6, 7, 3, 7, 2,
+					5, 0, 1, 5, 1, 4
+				};
 				break;
 
 			case ObjectType::Pyramid:
-				// Simple pyramid
-				mesh.vertices.push_back(Vertex{Vec3(0.0f, 0.5f, 0.0f), color});       // 0 - top
-				mesh.vertices.push_back(Vertex{Vec3(-0.5f, -0.5f, 0.5f), color});     // 1 - front-left
-				mesh.vertices.push_back(Vertex{Vec3(0.5f, -0.5f, 0.5f), color});      // 2 - front-right
-				mesh.vertices.push_back(Vertex{Vec3(0.5f, -0.5f, -0.5f), color});     // 3 - back-right
-				mesh.vertices.push_back(Vertex{Vec3(-0.5f, -0.5f, -0.5f), color});    // 4 - back-left
+				mesh.vertices.push_back(Vertex(glm::vec3(0.0f, 0.5f, 0.0f), glmColor));
+				mesh.vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glmColor));
+				mesh.vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glmColor));
+				mesh.vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glmColor));
+				mesh.vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glmColor));
 
-				// Front face
-				mesh.indices.push_back(0); mesh.indices.push_back(2); mesh.indices.push_back(1);
-				// Right face
-				mesh.indices.push_back(0); mesh.indices.push_back(3); mesh.indices.push_back(2);
-				// Back face
-				mesh.indices.push_back(0); mesh.indices.push_back(4); mesh.indices.push_back(3);
-				// Left face
-				mesh.indices.push_back(0); mesh.indices.push_back(1); mesh.indices.push_back(4);
+				mesh.indices = { 0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 1 };
 				break;
 
 			case ObjectType::Floor:
-				// Large plane for floor
-				mesh.vertices.push_back(Vertex{Vec3(-5.0f, 0.0f, -5.0f), color});   // 0
-				mesh.vertices.push_back(Vertex{Vec3(5.0f, 0.0f, -5.0f), color});    // 1
-				mesh.vertices.push_back(Vertex{Vec3(5.0f, 0.0f, 5.0f), color});     // 2
-				mesh.vertices.push_back(Vertex{Vec3(-5.0f, 0.0f, 5.0f), color});    // 3
+				mesh.vertices.push_back(Vertex(glm::vec3(-5.0f, 0.0f, -5.0f), glmColor));
+				mesh.vertices.push_back(Vertex(glm::vec3(5.0f, 0.0f, -5.0f), glmColor));
+				mesh.vertices.push_back(Vertex(glm::vec3(5.0f, 0.0f, 5.0f), glmColor));
+				mesh.vertices.push_back(Vertex(glm::vec3(-5.0f, 0.0f, 5.0f), glmColor));
 
-				mesh.indices.push_back(0); mesh.indices.push_back(1); mesh.indices.push_back(2);
-				mesh.indices.push_back(0); mesh.indices.push_back(2); mesh.indices.push_back(3);
+				mesh.indices = { 0, 1, 2, 0, 2, 3 };
 				break;
 		}
+
+		mesh.gpuDirty = true;
 	}
 
 }

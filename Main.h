@@ -1,9 +1,7 @@
 #pragma once
 
 #include "Core/GLApplication.h"
-#include "Core/Game/World.h"
-#include "Core/Render/Mesh.h"
-#include "Core/Assets/AssetManager.h"
+#include "Core/Editor/Editor.h"
 #include <memory>
 
 using namespace Bound;
@@ -20,9 +18,5 @@ protected:
 	void onShutdown() override;
 
 private:
-	std::unique_ptr<World> world_;
-	std::unique_ptr<AssetManager> assetManager_;
-	Mesh testMesh_;
-	
-	void loadScene();
+	std::unique_ptr<Editor> editor_;
 };

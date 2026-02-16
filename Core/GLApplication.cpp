@@ -1,13 +1,15 @@
 #include "GLApplication.h"
 #include "../Platform/SDLWindow.h"
-#include <SDL2/SDL.h>
+#include "Render/Camera.h"
+#include <SDL.h>
 #include <chrono>
 #include <glm/glm.hpp>
 
 namespace Bound {
 
 	GLApplication::GLApplication(const char* title, int width, int height)
-		: isRunning_(true), deltaTime_(0.0f) {
+		: isRunning_(true), initialized_(false), deltaTime_(0.0f),
+		  wasMousePressed_(false), lastMouseX_(0), lastMouseY_(0) {
 		
 		// Create SDL window with OpenGL context
 		window_ = std::make_unique<SDLWindow>(title, width, height);
@@ -69,34 +71,60 @@ namespace Bound {
 		float rotSpeed = 2.0f * deltaTime_;
 
 		// Movement (WASD)
-		if (window_->isKeyPressed(SDL_SCANCODE_W)) camera->moveForward(moveSpeed);
-		if (window_->isKeyPressed(SDL_SCANCODE_S)) camera->moveForward(-moveSpeed);
-		if (window_->isKeyPressed(SDL_SCANCODE_A)) camera->moveRight(-moveSpeed);
-		if (window_->isKeyPressed(SDL_SCANCODE_D)) camera->moveRight(moveSpeed);
+		if (window_->isKeyPressed(SDL_SCANCODE_W)) {
+			camera->moveForward(moveSpeed);
+		}
+		if (window_->isKeyPressed(SDL_SCANCODE_S)) {
+			camera->moveForward(-moveSpeed);
+		}
+		if (window_->isKeyPressed(SDL_SCANCODE_A)) {
+			camera->moveRight(moveSpeed);
+		}
+		if (window_->isKeyPressed(SDL_SCANCODE_D)) {
+			camera->moveRight(-moveSpeed);
+		}
 
 		// Up/Down (Space/Shift)
-		if (window_->isKeyPressed(SDL_SCANCODE_SPACE)) camera->moveUp(moveSpeed);
-		if (window_->isKeyPressed(SDL_SCANCODE_LSHIFT)) camera->moveUp(-moveSpeed);
+		if (window_->isKeyPressed(SDL_SCANCODE_SPACE)) {
+			camera->moveUp(-moveSpeed);
+		}
+		if (window_->isKeyPressed(SDL_SCANCODE_LSHIFT)) {
+			camera->moveUp(moveSpeed);
+		}
 
 		// Rotation (Arrow keys)
-		if (window_->isKeyPressed(SDL_SCANCODE_LEFT)) camera->rotate(-rotSpeed, 0.0f);
-		if (window_->isKeyPressed(SDL_SCANCODE_RIGHT)) camera->rotate(rotSpeed, 0.0f);
-		if (window_->isKeyPressed(SDL_SCANCODE_UP)) camera->rotate(0.0f, rotSpeed);
-		if (window_->isKeyPressed(SDL_SCANCODE_DOWN)) camera->rotate(0.0f, -rotSpeed);
+		if (window_->isKeyPressed(SDL_SCANCODE_LEFT)) {
+			camera->rotate(rotSpeed, 0.0f);
+		}
+		if (window_->isKeyPressed(SDL_SCANCODE_RIGHT)) {
+			camera->rotate(-rotSpeed, 0.0f);
+		}
+		if (window_->isKeyPressed(SDL_SCANCODE_UP)) {
+			camera->rotate(0.0f, rotSpeed);
+		}
+		if (window_->isKeyPressed(SDL_SCANCODE_DOWN)) {
+			camera->rotate(0.0f, -rotSpeed);
+		}
 
-		// Mouse look (right button)
-		if (window_->isMouseButtonPressed(3)) { // SDL_BUTTON_RIGHT = 3
+		// Mouse look (left or right button)
+		bool isMousePressed = window_->isMouseButtonPressed(1) || window_->isMouseButtonPressed(3);
+		
+		if (isMousePressed) {
 			int mouseX, mouseY;
 			window_->getMousePosition(mouseX, mouseY);
-			static int lastMouseX = 0, lastMouseY = 0;
-
-			float yawDelta = (mouseX - lastMouseX) * 0.002f;
-			float pitchDelta = (mouseY - lastMouseY) * 0.002f;
-
-			camera->rotate(yawDelta, pitchDelta);
-
-			lastMouseX = mouseX;
-			lastMouseY = mouseY;
+			
+			// Only update camera if mouse was already pressed last frame
+			if (wasMousePressed_) {
+				float yawDelta = -(mouseX - lastMouseX_) * 0.002f;
+				float pitchDelta = -(mouseY - lastMouseY_) * 0.002f;  // Inverted Y
+				camera->rotate(yawDelta, pitchDelta);
+			}
+			
+			lastMouseX_ = mouseX;
+			lastMouseY_ = mouseY;
+			wasMousePressed_ = true;
+		} else {
+			wasMousePressed_ = false;
 		}
 	}
 

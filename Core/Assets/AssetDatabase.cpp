@@ -1,5 +1,6 @@
 #include "AssetDatabase.h"
-#include <windows.h>
+#include <string>
+#include <Windows.h>
 #include <cstdio>
 #include <algorithm>
 

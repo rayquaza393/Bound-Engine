@@ -32,6 +32,10 @@ namespace Bound {
 		std::unique_ptr<SDLWindow> window_;
 		std::unique_ptr<GLRenderer> renderer_;
 		bool isRunning_;
+		bool initialized_;
+		bool wasMousePressed_;
+		int lastMouseX_;
+		int lastMouseY_;
 
 		// Timing
 		float deltaTime_;

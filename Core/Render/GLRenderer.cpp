@@ -24,14 +24,15 @@ varying vec3 vFragPos;
 
 void main() {
 	vFragPos = vec3(uModel * vec4(aPosition, 1.0));
-	vNormal = mat3(transpose(inverse(uModel))) * aNormal;
+	// Simplified normal transform - assumes uniform scaling
+	vNormal = normalize(mat3(uModel) * aNormal);
 	vColor = aColor;
 	
 	gl_Position = uProjection * uView * vec4(vFragPos, 1.0);
 }
 )";
 
-	// Basic fragment shader - flat color with simple lighting
+	// Basic fragment shader - simple unlit color
 	static const char* basicFragmentShader = R"(
 #version 120
 
@@ -43,21 +44,12 @@ uniform vec3 uLightPos;
 uniform vec3 uViewPos;
 
 void main() {
-	// Ambient
-	float ambientStrength = 0.35;
-	vec3 ambient = ambientStrength * vColor;
-
-	// Diffuse
+	// Just output the vertex color with simple lighting
 	vec3 norm = normalize(vNormal);
 	vec3 lightDir = normalize(uLightPos - vFragPos);
-	float diff = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = diff * vColor;
-
-	// Distance attenuation
-	float distance = length(uLightPos - vFragPos);
-	float attenuation = 1.0 / (1.0 + 0.1 * distance + 0.01 * distance * distance);
-
-	vec3 result = (ambient + diffuse * attenuation) * vColor;
+	float brightness = 0.5 + 0.5 * max(dot(norm, lightDir), 0.0);
+	
+	vec3 result = vColor * brightness;
 	gl_FragColor = vec4(result, 1.0);
 }
 )";
@@ -122,7 +114,7 @@ void main() {
 		basicShader_->setMat4("uProjection", projection);
 
 		// Set lighting uniforms
-		basicShader_->setVec3("uLightPos", glm::vec3(3.0f, 1.0f, 2.0f));
+		basicShader_->setVec3("uLightPos", glm::vec3(5.0f, 8.0f, 5.0f));
 		basicShader_->setVec3("uViewPos", camera_->getGLMPosition());
 
 		// Draw mesh

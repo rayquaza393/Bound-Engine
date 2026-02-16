@@ -102,10 +102,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Libs\;../imgui;C:\Projects\Bound-Engine\Bound-Engine\imgui\backends;../imgui/backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -123,6 +125,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\imgui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="..\imgui\imgui.cpp" />
+    <ClCompile Include="..\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Core\Assets\AssetDatabase.cpp" />
     <ClCompile Include="Core\Assets\AssetManager.cpp" />
     <ClCompile Include="Core\Assets\AssetManagerImpl.cpp" />
@@ -130,6 +138,8 @@
     <ClCompile Include="Core\Assets\MeshLibraryImpl.cpp" />
     <ClCompile Include="Core\Editor\Editor.cpp" />
     <ClCompile Include="Core\Editor\EditorObject.cpp" />
+    <ClCompile Include="Core\Editor\EditorUI.cpp" />
+    <ClCompile Include="Core\Editor\ImGuiManager.cpp" />
     <ClCompile Include="Core\Game\Level.cpp" />
     <ClCompile Include="Core\Game\World.cpp" />
     <ClCompile Include="Core\GLApplication.cpp" />
@@ -142,10 +152,14 @@
     <ClCompile Include="Platform\SDLWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\Assets\AssetDatabase.h" />
     <ClInclude Include="Core\Assets\AssetManager.h" />
     <ClInclude Include="Core\Assets\MeshLibrary.h" />
     <ClInclude Include="Core\Editor\Editor.h" />
     <ClInclude Include="Core\Editor\EditorObject.h" />
+    <ClInclude Include="Core\Editor\EditorUI.h" />
+    <ClInclude Include="Core\Editor\ImGuiManager.h" />
+    <ClInclude Include="Core\Editor\ImGui_Bridge.h" />
     <ClInclude Include="Core\Game\Level.h" />
     <ClInclude Include="Core\Game\World.h" />
     <ClInclude Include="Core\GLApplication.h" />
@@ -157,6 +171,7 @@
     <ClInclude Include="Core\Render\Shader.h" />
     <ClInclude Include="Core\Serialization\LevelFormat.h" />
     <ClInclude Include="Main.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Platform\SDLWindow.h" />
   </ItemGroup>
   <ItemGroup>
@@ -167,6 +182,7 @@
     <None Include="EDITOR.md" />
     <None Include="FILE_MANIFEST.md" />
     <None Include="GETTING_STARTED.md" />
+    <None Include="IMGUI_SETUP.md" />
     <None Include="IMPLEMENTATION.md" />
     <None Include="INDEX.md" />
     <None Include="packages.config" />
@@ -183,9 +199,11 @@
   <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets" Condition="Exists('packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets')" />
     <Import Project="packages\Assimp.3.0.0\build\native\Assimp.targets" Condition="Exists('packages\Assimp.3.0.0\build\native\Assimp.targets')" />
-    <Import Project="packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets" Condition="Exists('packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" />
-    <Import Project="packages\sdl2.2.0.5\build\native\sdl2.targets" Condition="Exists('packages\sdl2.2.0.5\build\native\sdl2.targets')" />
     <Import Project="packages\glm.1.0.3\build\native\glm.targets" Condition="Exists('packages\glm.1.0.3\build\native\glm.targets')" />
+    <Import Project="packages\sdl2.nuget.redist.2.32.8\build\native\sdl2.nuget.redist.targets" Condition="Exists('packages\sdl2.nuget.redist.2.32.8\build\native\sdl2.nuget.redist.targets')" />
+    <Import Project="packages\sdl2.nuget.2.32.8\build\native\sdl2.nuget.targets" Condition="Exists('packages\sdl2.nuget.2.32.8\build\native\sdl2.nuget.targets')" />
+    <Import Project="packages\nupengl.core.redist.0.1.0.1\build\native\nupengl.core.redist.targets" Condition="Exists('packages\nupengl.core.redist.0.1.0.1\build\native\nupengl.core.redist.targets')" />
+    <Import Project="packages\nupengl.core.0.1.0.1\build\native\nupengl.core.targets" Condition="Exists('packages\nupengl.core.0.1.0.1\build\native\nupengl.core.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -193,8 +211,10 @@
     </PropertyGroup>
     <Error Condition="!Exists('packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets'))" />
     <Error Condition="!Exists('packages\Assimp.3.0.0\build\native\Assimp.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Assimp.3.0.0\build\native\Assimp.targets'))" />
-    <Error Condition="!Exists('packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets'))" />
-    <Error Condition="!Exists('packages\sdl2.2.0.5\build\native\sdl2.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\sdl2.2.0.5\build\native\sdl2.targets'))" />
     <Error Condition="!Exists('packages\glm.1.0.3\build\native\glm.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\glm.1.0.3\build\native\glm.targets'))" />
+    <Error Condition="!Exists('packages\sdl2.nuget.redist.2.32.8\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\sdl2.nuget.redist.2.32.8\build\native\sdl2.nuget.redist.targets'))" />
+    <Error Condition="!Exists('packages\sdl2.nuget.2.32.8\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\sdl2.nuget.2.32.8\build\native\sdl2.nuget.targets'))" />
+    <Error Condition="!Exists('packages\nupengl.core.redist.0.1.0.1\build\native\nupengl.core.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\nupengl.core.redist.0.1.0.1\build\native\nupengl.core.redist.targets'))" />
+    <Error Condition="!Exists('packages\nupengl.core.0.1.0.1\build\native\nupengl.core.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\nupengl.core.0.1.0.1\build\native\nupengl.core.targets'))" />
   </Target>
 </Project>

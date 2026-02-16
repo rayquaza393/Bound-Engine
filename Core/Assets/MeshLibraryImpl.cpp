@@ -41,17 +41,25 @@ namespace Bound {
 		Mesh mesh;
 		float s = size * 0.5f;
 
-		mesh.vertices.push_back(Vertex(glm::vec3(0, s, 0), glm::vec3(1, 1, 1)));
-		mesh.vertices.push_back(Vertex(glm::vec3(-s, -s, s), glm::vec3(1, 1, 1)));
-		mesh.vertices.push_back(Vertex(glm::vec3(s, -s, s), glm::vec3(1, 1, 1)));
-		mesh.vertices.push_back(Vertex(glm::vec3(s, -s, -s), glm::vec3(1, 1, 1)));
-		mesh.vertices.push_back(Vertex(glm::vec3(-s, -s, -s), glm::vec3(1, 1, 1)));
+		// All vertices use a simple upward normal
+		glm::vec3 upNormal(0.0f, 1.0f, 0.0f);
+		
+		// Apex
+		mesh.vertices.push_back(Vertex(glm::vec3(0, -s, 0), glm::vec3(1, 1, 1), upNormal));
+		// Front-left base vertex
+		mesh.vertices.push_back(Vertex(glm::vec3(-s, s, s), glm::vec3(1, 1, 1), upNormal));
+		// Front-right base vertex
+		mesh.vertices.push_back(Vertex(glm::vec3(s, s, s), glm::vec3(1, 1, 1), upNormal));
+		// Back-right base vertex
+		mesh.vertices.push_back(Vertex(glm::vec3(s, s, -s), glm::vec3(1, 1, 1), upNormal));
+		// Back-left base vertex
+		mesh.vertices.push_back(Vertex(glm::vec3(-s, s, -s), glm::vec3(1, 1, 1), upNormal));
 
 		mesh.indices = {
-			0, 2, 1,
-			0, 3, 2,
-			0, 4, 3,
-			0, 1, 4
+			0, 1, 2,
+			0, 2, 3,
+			0, 3, 4,
+			0, 4, 1
 		};
 
 		mesh.gpuDirty = true;
@@ -63,10 +71,12 @@ namespace Bound {
 		float w = width * 0.5f;
 		float h = height * 0.5f;
 
-		mesh.vertices.push_back(Vertex(glm::vec3(-w, 0, -h), glm::vec3(1, 1, 1)));
-		mesh.vertices.push_back(Vertex(glm::vec3(w, 0, -h), glm::vec3(1, 1, 1)));
-		mesh.vertices.push_back(Vertex(glm::vec3(w, 0, h), glm::vec3(1, 1, 1)));
-		mesh.vertices.push_back(Vertex(glm::vec3(-w, 0, h), glm::vec3(1, 1, 1)));
+		// All vertices have upward normal (0, 1, 0)
+		glm::vec3 upNormal(0.0f, 1.0f, 0.0f);
+		mesh.vertices.push_back(Vertex(glm::vec3(-w, 0, -h), glm::vec3(1, 1, 1), upNormal));
+		mesh.vertices.push_back(Vertex(glm::vec3(w, 0, -h), glm::vec3(1, 1, 1), upNormal));
+		mesh.vertices.push_back(Vertex(glm::vec3(w, 0, h), glm::vec3(1, 1, 1), upNormal));
+		mesh.vertices.push_back(Vertex(glm::vec3(-w, 0, h), glm::vec3(1, 1, 1), upNormal));
 
 		mesh.indices = { 0, 1, 2, 0, 2, 3 };
 

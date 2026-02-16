@@ -9,10 +9,24 @@
 // For now, the struct definitions are in LevelFormat.h
 
 #include "LevelFormat.h"
+#include <fstream>
 
 namespace Bound {
 
-	// Stub implementations - to be implemented later
-	// when integrated with test framework and asset manifest system
+	bool LevelSerializer::save(const std::string& filename, const LevelDefinition& level) {
+		// Stub implementation - to be implemented later
+		return false;
+	}
+
+	bool LevelSerializer::load(const std::string& filename, LevelDefinition& level) {
+		// Stub implementation - to be implemented later
+		return false;
+	}
+
+	LevelDefinition LevelSerializer::createDefaultLevel() {
+		LevelDefinition level;
+		level.name = "Default Level";
+		return level;
+	}
 
 }

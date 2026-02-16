@@ -40,6 +40,12 @@ namespace Bound {
 		program_ = glCreateProgram();
 		glAttachShader(program_, vertex);
 		glAttachShader(program_, fragment);
+		
+		// Bind vertex attributes before linking
+		glBindAttribLocation(program_, 0, "aPosition");
+		glBindAttribLocation(program_, 1, "aColor");
+		glBindAttribLocation(program_, 2, "aNormal");
+		
 		glLinkProgram(program_);
 
 		// Check link status

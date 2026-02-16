@@ -40,16 +40,13 @@
     <Filter Include="Documentation">
       <UniqueIdentifier>{57e1d65b-2a1d-42c8-9c37-89055c2c3af6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Editor">
+      <UniqueIdentifier>{ebf7e20c-5821-4f03-852b-2324a7d332bc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Render\Camera.cpp">
       <Filter>Core\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Editor\Editor.cpp">
-      <Filter>Core\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Editor\EditorObject.cpp">
-      <Filter>Core\Tools</Filter>
     </ClCompile>
     <ClCompile Include="Core\Assets\AssetDatabase.cpp">
       <Filter>Core\Assets</Filter>
@@ -93,6 +90,12 @@
     <ClCompile Include="Core\Render\Shader.cpp">
       <Filter>Core\Render</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Editor\EditorObject.cpp">
+      <Filter>Core\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Editor\Editor.cpp">
+      <Filter>Core\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Math\Vector.h">
@@ -128,9 +131,6 @@
     <ClInclude Include="Core\GLApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Serialization\LevelFormat.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Assets\MeshLibrary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -141,6 +141,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\Render\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Assets\AssetDatabase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Serialization\LevelFormat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -172,9 +181,6 @@
     <None Include="INDEX.md">
       <Filter>Documentation</Filter>
     </None>
-    <None Include="packages.config">
-      <Filter>Documentation</Filter>
-    </None>
     <None Include="PROJECT_REPORT.md">
       <Filter>Documentation</Filter>
     </None>
@@ -199,5 +205,6 @@
     <None Include="TESTING_FRAMEWORK.md">
       <Filter>Documentation</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

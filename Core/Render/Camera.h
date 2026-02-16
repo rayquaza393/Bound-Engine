@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Math/Vector.h"
+#include <glm/glm.hpp>
 
 namespace Bound {
 
@@ -13,6 +14,11 @@ namespace Bound {
 		Mat4 getViewMatrix() const;
 		Mat4 getProjectionMatrix() const;
 		Mat4 getViewProjectionMatrix() const;
+
+		// GLM versions for GPU rendering
+		glm::mat4 getGLMViewMatrix() const;
+		glm::mat4 getGLMProjectionMatrix() const;
+		glm::vec3 getGLMPosition() const { return glm::vec3(position_.x, position_.y, position_.z); }
 
 		// Position and orientation
 		void setPosition(const Vec3& pos) { position_ = pos; }

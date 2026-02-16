@@ -1,6 +1,6 @@
 #include "SDLWindow.h"
 #include <GL/glew.h>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <cstring>
 #include <cstdio>
 
@@ -83,7 +83,8 @@ namespace Bound {
 					break;
 				case SDL_KEYDOWN:
 					if (event.key.keysym.sym == SDLK_ESCAPE) {
-						isOpen_ = false;
+						// Don't close on ESC - let the app handle it
+						// isOpen_ = false;
 					}
 					break;
 			}

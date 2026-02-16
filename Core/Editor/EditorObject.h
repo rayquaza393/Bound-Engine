@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Math/Vector.h"
-#include "../Math/Geometry.h"
+#include "../Render/Mesh.h"
 
 namespace Bound {
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Math/Geometry.h"
+#include "../Math/Vector.h"
 #include <vector>
 #include <string>
 #include <cstdint>
@@ -10,6 +10,16 @@
 #undef max
 
 namespace Bound {
+
+// Level-specific vertex for binary serialization (uses custom Vec3)
+struct LevelVertex {
+	Vec3 position;
+	Vec3 color;
+	Vec3 normal;
+
+	LevelVertex() : position(0, 0, 0), color(1, 1, 1), normal(0, 1, 0) {}
+	LevelVertex(const Vec3& pos, const Vec3& col) : position(pos), color(col), normal(0, 1, 0) {}
+};
 
 struct BoundingBox {
 Vec3 min;
@@ -28,7 +38,7 @@ BoundingBox(const Vec3& minPoint, const Vec3& maxPoint)
 };
 
 struct Chunk {
-    std::vector<Vertex> vertices;
+    std::vector<LevelVertex> vertices;
     std::vector<uint32_t> indices;
     BoundingBox bounds;
     std::string name;
