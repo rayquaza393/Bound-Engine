@@ -4,6 +4,8 @@
 #include <SDL.h>
 #include <chrono>
 #include <glm/glm.hpp>
+#include <cstdio>
+#include <imgui.h>
 
 namespace Bound {
 
@@ -16,6 +18,9 @@ namespace Bound {
 
 		// Create GL renderer
 		renderer_ = std::make_unique<GLRenderer>();
+		
+		// Initialize renderer with window
+		renderer_->initialize(window_.get());
 
 		// Call user init
 		onInit();
@@ -35,8 +40,15 @@ namespace Bound {
 		}
 
 		auto lastTime = std::chrono::high_resolution_clock::now();
+		
+		printf("Entering main loop... isRunning=%d, isOpen=%d\n", isRunning_, window_->isOpen());
+		fflush(stdout);
+		
+		int frameCount = 0;
 
 		while (isRunning_ && window_->isOpen()) {
+			frameCount++;
+			
 			// Update window
 			window_->update();
 
@@ -49,17 +61,26 @@ namespace Bound {
 			// Update input
 			updateInput();
 
-			// Game update
+			// Game update (calls onUpdate which initializes ImGui frame)
 			onUpdate(deltaTime_);
 
-			// Rendering
+			// Rendering phase 1: Render 3D scene to offscreen framebuffer
 			renderer_->beginFrame();
 			onRender();
-			renderer_->endFrame();
+			renderer_->endFrame();  // Unbinds FBO, clears main framebuffer, restores viewport
 
 			// Present to screen
 			window_->swapBuffers();
+			
+			// Debug output every 60 frames
+			if (frameCount % 60 == 0) {
+				printf("Frame %d: fps=%.1f\n", frameCount, 1.0f / deltaTime_);
+				fflush(stdout);
+			}
 		}
+		
+		printf("Main loop exited after %d frames. isRunning=%d, isOpen=%d\n", frameCount, isRunning_, window_->isOpen());
+		fflush(stdout);
 	}
 
 	void GLApplication::updateInput() {

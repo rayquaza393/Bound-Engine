@@ -36,8 +36,10 @@ namespace Bound {
 		ImGuiIO& io = ImGui::GetIO();
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		
-		// Set display size
-		io.DisplaySize = ImVec2(1280.0f, 720.0f);
+		// Set display size to actual window size
+		int windowWidth = window_->getWidth();
+		int windowHeight = window_->getHeight();
+		io.DisplaySize = ImVec2(static_cast<float>(windowWidth), static_cast<float>(windowHeight));
 		io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
 		
 		// Setup style
@@ -47,7 +49,7 @@ namespace Bound {
 		ImGui_ImplOpenGL3_Init("#version 330");
 		
 		initialized_ = true;
-		printf("ImGuiManager initialized with SDL2 + OpenGL3 (1280x720)\n");
+		printf("ImGuiManager initialized with SDL2 + OpenGL3 (%dx%d)\n", windowWidth, windowHeight);
 	}
 
 	void ImGuiManager::shutdown() {
@@ -64,7 +66,12 @@ namespace Bound {
 		if (!initialized_) return;
 		
 		ImGuiIO& io = ImGui::GetIO();
-		io.DisplaySize = ImVec2(1280.0f, 720.0f);
+		
+		// Update display size in case window was resized
+		if (window_) {
+			io.DisplaySize = ImVec2(static_cast<float>(window_->getWidth()), 
+									 static_cast<float>(window_->getHeight()));
+		}
 		
 		// Handle SDL2 input events manually
 		handleSDLInput();

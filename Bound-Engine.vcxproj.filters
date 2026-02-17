@@ -43,6 +43,9 @@
     <Filter Include="Core\Editor">
       <UniqueIdentifier>{ebf7e20c-5821-4f03-852b-2324a7d332bc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Assets\Icons">
+      <UniqueIdentifier>{994a840b-15f7-4dfb-8984-d0d9e67b3cf1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Render\Camera.cpp">
@@ -57,20 +60,11 @@
     <ClCompile Include="Core\Assets\AssetManagerImpl.cpp">
       <Filter>Core\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="Core\GLApplication.cpp">
-      <Filter>Core\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Render\GLRenderer.cpp">
-      <Filter>Core\Render</Filter>
-    </ClCompile>
     <ClCompile Include="Core\Serialization\LevelFormat.cpp">
       <Filter>Core\Assets\Levels</Filter>
     </ClCompile>
     <ClCompile Include="Core\Game\Level.cpp">
       <Filter>Core\Assets\Levels</Filter>
-    </ClCompile>
-    <ClCompile Include="Main.cpp">
-      <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="Core\Render\Mesh.cpp">
       <Filter>Main</Filter>
@@ -93,8 +87,47 @@
     <ClCompile Include="Core\Editor\EditorObject.cpp">
       <Filter>Core\Editor</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Editor\Editor.cpp">
+    <ClCompile Include="..\imgui\imgui.cpp">
       <Filter>Core\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\imgui_draw.cpp">
+      <Filter>Core\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\backends\imgui_impl_opengl3.cpp">
+      <Filter>Core\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\backends\imgui_impl_win32.cpp">
+      <Filter>Core\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\imgui_tables.cpp">
+      <Filter>Core\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\imgui_widgets.cpp">
+      <Filter>Core\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Serialization\SceneSerializer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GLApplication.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Editor\Editor.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Editor\ImGuiManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Render\GLRenderer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Editor\EditorUI.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Editor\IconManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +185,24 @@
     <ClInclude Include="Core\Serialization\LevelFormat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Editor\ImGuiManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Editor\ImGui_Bridge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Editor\IconManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Editor\EditorUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stb-master\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Serialization\SceneSerializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ARCHITECTURE.md">
@@ -205,6 +256,34 @@
     <None Include="TESTING_FRAMEWORK.md">
       <Filter>Documentation</Filter>
     </None>
-    <None Include="packages.config" />
+    <None Include="IMGUI_SETUP.md">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="packages.config">
+      <Filter>Documentation</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Core\Assets\Icons\add.png">
+      <Filter>Core\Assets\Icons</Filter>
+    </Image>
+    <Image Include="Core\Assets\Icons\delete.png">
+      <Filter>Core\Assets\Icons</Filter>
+    </Image>
+    <Image Include="Core\Assets\Icons\move.png">
+      <Filter>Core\Assets\Icons</Filter>
+    </Image>
+    <Image Include="Core\Assets\Icons\resize.png">
+      <Filter>Core\Assets\Icons</Filter>
+    </Image>
+    <Image Include="Core\Assets\Icons\rotate.png">
+      <Filter>Core\Assets\Icons</Filter>
+    </Image>
+    <Image Include="Core\Assets\Icons\save.png">
+      <Filter>Core\Assets\Icons</Filter>
+    </Image>
+    <Image Include="Core\Assets\Icons\select.png">
+      <Filter>Core\Assets\Icons</Filter>
+    </Image>
   </ItemGroup>
 </Project>

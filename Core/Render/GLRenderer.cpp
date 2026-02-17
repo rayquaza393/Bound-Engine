@@ -1,5 +1,6 @@
 #include "GLRenderer.h"
 #include "Camera.h"
+#include "../../Platform/SDLWindow.h"
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <cstdio>
@@ -54,7 +55,9 @@ void main() {
 }
 )";
 
-	GLRenderer::GLRenderer() {
+	GLRenderer::GLRenderer() 
+		: window_(nullptr), framebufferObject_(0), sceneTexture_(0), 
+		  depthRenderbuffer_(0), sceneTextureWidth_(1280), sceneTextureHeight_(720) {
 		printf("=== GLRenderer initializing ===\n");
 
 		// Set OpenGL clear color
@@ -71,7 +74,17 @@ void main() {
 		// Initialize shaders
 		initializeShaders();
 
-		printf("=== GLRenderer initialized ===\n");
+		printf("=== GLRenderer initialized (waiting for window) ===\n");
+	}
+
+	void GLRenderer::initialize(SDLWindow* window) {
+		window_ = window;
+		
+		if (window_) {
+			sceneTextureWidth_ = window_->getWidth();
+			sceneTextureHeight_ = window_->getHeight();
+			printf("GLRenderer window size: %dx%d\n", sceneTextureWidth_, sceneTextureHeight_);
+		}
 	}
 
 	GLRenderer::~GLRenderer() {
@@ -84,11 +97,19 @@ void main() {
 	}
 
 	void GLRenderer::beginFrame() {
+		// Render directly to main framebuffer
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		
+		if (window_) {
+			glViewport(0, 0, window_->getWidth(), window_->getHeight());
+		}
+		
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
 	void GLRenderer::endFrame() {
-		// Post-processing would go here
+		// Nothing to do - rendering already went to screen
 	}
 
 	void GLRenderer::drawMesh(const Mesh& mesh, const glm::mat4& transform) {
@@ -124,6 +145,22 @@ void main() {
 	void GLRenderer::shutdown() {
 		basicShader_.reset();
 		camera_.reset();
+
+		// Clean up framebuffer objects (not used anymore)
+		if (sceneTexture_ != 0) {
+			glDeleteTextures(1, &sceneTexture_);
+		}
+		if (depthRenderbuffer_ != 0) {
+			glDeleteRenderbuffers(1, &depthRenderbuffer_);
+		}
+		if (framebufferObject_ != 0) {
+			glDeleteFramebuffers(1, &framebufferObject_);
+		}
+	}
+
+	void GLRenderer::initializeFramebuffer(int width, int height) {
+		// No longer used - keeping for compatibility
+		printf("initializeFramebuffer called but not needed\n");
 	}
 
 }

@@ -28,7 +28,7 @@ namespace Bound {
 			SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED,
 			width, height,
-			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
+			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
 		);
 
 		if (!window_) {
@@ -79,12 +79,23 @@ namespace Bound {
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 				case SDL_QUIT:
+					printf("SDL_QUIT event received\n");
+					fflush(stdout);
 					isOpen_ = false;
 					break;
 				case SDL_KEYDOWN:
 					if (event.key.keysym.sym == SDLK_ESCAPE) {
+						printf("ESC key pressed\n");
 						// Don't close on ESC - let the app handle it
-						// isOpen_ = false;
+					}
+					break;
+				case SDL_WINDOWEVENT:
+					printf("SDL_WINDOWEVENT: %d\n", event.window.event);
+					fflush(stdout);
+					if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
+						printf("Window close event\n");
+						fflush(stdout);
+						isOpen_ = false;
 					}
 					break;
 			}

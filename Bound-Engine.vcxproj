@@ -139,6 +139,7 @@
     <ClCompile Include="Core\Editor\Editor.cpp" />
     <ClCompile Include="Core\Editor\EditorObject.cpp" />
     <ClCompile Include="Core\Editor\EditorUI.cpp" />
+    <ClCompile Include="Core\Editor\IconManager.cpp" />
     <ClCompile Include="Core\Editor\ImGuiManager.cpp" />
     <ClCompile Include="Core\Game\Level.cpp" />
     <ClCompile Include="Core\Game\World.cpp" />
@@ -148,16 +149,19 @@
     <ClCompile Include="Core\Render\Mesh.cpp" />
     <ClCompile Include="Core\Render\Shader.cpp" />
     <ClCompile Include="Core\Serialization\LevelFormat.cpp" />
+    <ClCompile Include="Core\Serialization\SceneSerializer.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Platform\SDLWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\stb-master\stb_image.h" />
     <ClInclude Include="Core\Assets\AssetDatabase.h" />
     <ClInclude Include="Core\Assets\AssetManager.h" />
     <ClInclude Include="Core\Assets\MeshLibrary.h" />
     <ClInclude Include="Core\Editor\Editor.h" />
     <ClInclude Include="Core\Editor\EditorObject.h" />
     <ClInclude Include="Core\Editor\EditorUI.h" />
+    <ClInclude Include="Core\Editor\IconManager.h" />
     <ClInclude Include="Core\Editor\ImGuiManager.h" />
     <ClInclude Include="Core\Editor\ImGui_Bridge.h" />
     <ClInclude Include="Core\Game\Level.h" />
@@ -170,6 +174,7 @@
     <ClInclude Include="Core\Render\Mesh.h" />
     <ClInclude Include="Core\Render\Shader.h" />
     <ClInclude Include="Core\Serialization\LevelFormat.h" />
+    <ClInclude Include="Core\Serialization\SceneSerializer.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Platform\SDLWindow.h" />
@@ -194,6 +199,15 @@
     <None Include="SETUP_COMPLETE.md" />
     <None Include="STRUCTURE.md" />
     <None Include="TESTING_FRAMEWORK.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Core\Assets\Icons\add.png" />
+    <Image Include="Core\Assets\Icons\delete.png" />
+    <Image Include="Core\Assets\Icons\move.png" />
+    <Image Include="Core\Assets\Icons\resize.png" />
+    <Image Include="Core\Assets\Icons\rotate.png" />
+    <Image Include="Core\Assets\Icons\save.png" />
+    <Image Include="Core\Assets\Icons\select.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

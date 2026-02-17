@@ -1,19 +1,22 @@
 #include "Editor.h"
 #include "EditorUI.h"
 #include "ImGuiManager.h"
+#include "../Serialization/SceneSerializer.h"
 #include "../Render/GLRenderer.h"
 #include "../Render/Camera.h"
 #include "../../Platform/SDLWindow.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
 #include <cstdio>
+#include <climits>
 
 namespace Bound {
 
 	Editor::Editor()
 		: active_(true), playMode_(false), renderer_(nullptr), editorCamera_(nullptr),
 		  selectedObject_(nullptr), nextObjectId_(1), gizmoScale_(1.0f),
-		  showGrid_(true), showHierarchy_(true), showProperties_(true), showViewport_(true) {
+		  showGrid_(true), showHierarchy_(true), showProperties_(true), showViewport_(true),
+		  currentTool_(EditorTool::Select) {
 		printf("Editor created\n");
 	}
 
@@ -53,12 +56,7 @@ namespace Bound {
 	void Editor::render() {
 		if (!active_) return;
 
-		// Render ImGui UI first (on top layer)
-		if (ui_) {
-			ui_->render(this);
-		}
-
-		// Render 3D objects in viewport
+		// Render 3D scene (happens while bound to offscreen framebuffer)
 		for (auto& obj : objects_) {
 			glm::mat4 transform = glm::mat4(1.0f);
 			transform = glm::translate(transform, glm::vec3(obj->position.x, obj->position.y, obj->position.z));
@@ -69,8 +67,17 @@ namespace Bound {
 
 			renderer_->drawMesh(obj->mesh, transform);
 		}
+	}
+
+	void Editor::renderUI() {
+		if (!active_) return;
 		
-		// Render ImGui after 3D objects
+		// Render ImGui UI (happens after endFrame() unbinds FBO and clears main buffer)
+		if (ui_) {
+			ui_->render(this);
+		}
+		
+		// Finalize ImGui rendering to main framebuffer
 		if (imguiManager_) {
 			imguiManager_->endFrame();
 		}
@@ -117,12 +124,29 @@ namespace Bound {
 
 	bool Editor::saveScene(const std::string& filename) {
 		printf("Saving scene to %s\n", filename.c_str());
-		return true;
+		return SceneSerializer::saveScene(filename, objects_);
 	}
 
 	bool Editor::loadScene(const std::string& filename) {
 		printf("Loading scene from %s\n", filename.c_str());
-		return true;
+		bool success = SceneSerializer::loadScene(filename, objects_);
+		
+		if (success) {
+			// Update nextObjectId_ to be higher than any loaded object
+			if (!objects_.empty()) {
+				int maxId = 0;
+				for (const auto& obj : objects_) {
+					if (obj->id > maxId) {
+						maxId = obj->id;
+					}
+				}
+				nextObjectId_ = maxId + 1;
+			}
+			selectedObject_ = nullptr;
+			printf("Scene loaded successfully with %zu objects\n", objects_.size());
+		}
+		
+		return success;
 	}
 
 	void Editor::renderMainMenuBar() {
@@ -144,6 +168,50 @@ namespace Bound {
 	}
 
 	void Editor::updateGizmoInteraction() {
+	}
+
+	EditorObject* Editor::raycastFromScreenPos(int screenX, int screenY, int screenWidth, int screenHeight) {
+		if (!editorCamera_) return nullptr;
+
+		// Convert screen coordinates to NDC (Normalized Device Coordinates)
+		float ndcX = (2.0f * screenX) / screenWidth - 1.0f;
+		float ndcY = 1.0f - (2.0f * screenY) / screenHeight;
+
+		// Create ray in camera space
+		glm::vec4 rayClip(ndcX, ndcY, -1.0f, 1.0f);
+		glm::vec4 rayEye = glm::inverse(editorCamera_->getGLMProjectionMatrix()) * rayClip;
+		rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
+
+		// Transform to world space
+		glm::vec3 rayWorld = glm::normalize(glm::vec3(glm::inverse(editorCamera_->getGLMViewMatrix()) * rayEye));
+		glm::vec3 rayOrigin = editorCamera_->getGLMPosition();
+
+		// Test intersection with all objects using bounding sphere
+		float closestDistance = FLT_MAX;
+		EditorObject* closestObject = nullptr;
+
+		for (auto& obj : objects_) {
+			// Simple bounding sphere test - sphere centered at object position with radius 1.0
+			glm::vec3 toObject = glm::vec3(obj->position.x, obj->position.y, obj->position.z) - rayOrigin;
+			float dist = glm::length(toObject);
+			
+			// Distance from ray to sphere center
+			glm::vec3 rayToSphere = toObject - rayWorld * glm::dot(toObject, rayWorld);
+			float sphereDistance = glm::length(rayToSphere);
+			
+			// Radius scaled by object's scale
+			float maxScale = obj->scale.x;
+			if (obj->scale.y > maxScale) maxScale = obj->scale.y;
+			if (obj->scale.z > maxScale) maxScale = obj->scale.z;
+			float radius = maxScale * 1.5f;
+			
+			if (sphereDistance < radius && dist < closestDistance) {
+				closestDistance = dist;
+				closestObject = obj.get();
+			}
+		}
+
+		return closestObject;
 	}
 
 }

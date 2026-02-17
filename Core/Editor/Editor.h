@@ -10,6 +10,13 @@
 
 namespace Bound {
 
+enum class EditorTool {
+Select = 0,
+Move = 1,
+Rotate = 2,
+Scale = 3
+};
+
 	class GLRenderer;
 	class Camera;
 	class EditorUI;
@@ -33,15 +40,20 @@ namespace Bound {
 		void toggleActive() { active_ = !active_; }
 		bool isPlayMode() const { return playMode_; }
 		void setPlayMode(bool play) { playMode_ = play; }
+		
+		// Exit request
+		void requestExit() { active_ = false; }
 
 		// Main update/render loop
 		void update(float deltaTime);
-		void render();
+		void render();     // Render 3D scene (happens in offscreen FBO)
+		void renderUI();   // Render ImGui UI (happens to main framebuffer)
 		void handleInput();
 
 		// Scene management
 		EditorObject* createObject(ObjectType type, const glm::vec3& position);
 		void deleteObject(int id);
+		void clearScene() { objects_.clear(); selectedObject_ = nullptr; }
 		EditorObject* getSelectedObject() const { return selectedObject_; }
 		void selectObject(EditorObject* obj) { selectedObject_ = obj; }
 		const std::vector<std::unique_ptr<EditorObject>>& getObjects() const { return objects_; }
@@ -49,6 +61,16 @@ namespace Bound {
 		// Camera control
 		Camera* getEditorCamera() { return editorCamera_; }
 		void resetCamera();
+		
+		// Renderer access
+		GLRenderer* getRenderer() { return renderer_; }
+		
+		// Raycasting for mouse selection
+		EditorObject* raycastFromScreenPos(int screenX, int screenY, int screenWidth, int screenHeight);
+		
+		// Tool management
+		EditorTool getCurrentTool() const { return currentTool_; }
+		void setCurrentTool(EditorTool tool) { currentTool_ = tool; }
 
 		// File operations
 		bool saveScene(const std::string& filename);
@@ -57,6 +79,7 @@ namespace Bound {
 	private:
 		bool active_;
 		bool playMode_;
+		EditorTool currentTool_;
 		GLRenderer* renderer_;
 		Camera* editorCamera_;
 

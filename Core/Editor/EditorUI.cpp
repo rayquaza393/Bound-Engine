@@ -1,12 +1,15 @@
 #include "EditorUI.h"
+#include "IconManager.h"
 #include "Editor.h"
+#include "../Render/GLRenderer.h"
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <vector>
 #include <cstdarg>
 
 namespace Bound {
 
-	// Simple debug console with vector-based logging
+	// Simple debug console
 	class DebugConsole {
 	public:
 		static const int MAX_LOGS = 256;
@@ -34,25 +37,20 @@ namespace Bound {
 				return;
 			}
 
-			// Always show controls and content
 			if (ImGui::Button("Clear")) {
 				logs_.clear();
 			}
 			ImGui::SameLine();
 			ImGui::Text("Logs: %zu", logs_.size());
-
 			ImGui::Separator();
 			
-			// Create scrolling region with fixed height for content
 			ImGui::BeginChild("ScrollingRegion", ImVec2(0, -30));
 			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
 
-			// Display all logs in order
 			for (const auto& log : logs_) {
 				ImGui::TextUnformatted(log.c_str());
 			}
 
-			// Auto-scroll to bottom when new logs are added
 			if (autoScroll_) {
 				ImGui::SetScrollHereY(1.0f);
 				autoScroll_ = false;
@@ -68,19 +66,25 @@ namespace Bound {
 		bool autoScroll_;
 	};
 
-	// Global console instance
 	static DebugConsole g_console;
 
 	EditorUI::EditorUI()
-		: showDemoWindow_(false) {
-		// Set light theme
+		: showDemoWindow_(false), 
+		  hierarchyWidth_(250.0f),
+		  propertiesWidth_(250.0f),
+		  consoleHeight_(120.0f),
+		  iconManager_(std::make_unique<IconManager>()),
+		  iconsLoaded_(false) {
 		ImGui::StyleColorsLight();
 		ImGuiStyle& style = ImGui::GetStyle();
 		style.WindowRounding = 4.0f;
 		style.FrameRounding = 3.0f;
 		style.GrabRounding = 2.0f;
+		
+		ImVec4 bgColor = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
+		bgColor.w = 1.0f;  // opacity
+		ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = bgColor;
 
-		// Add some logs
 		g_console.addLog("=== Bound Engine Editor ===");
 		g_console.addLog("Ready to create objects!");
 	}
@@ -88,86 +92,131 @@ namespace Bound {
 	EditorUI::~EditorUI() {
 	}
 
+	void EditorUI::loadIcons() {
+		if (iconsLoaded_) return;
+		iconManager_->loadIcon("move", "Core/Assets/Icons/move.png");
+		iconManager_->loadIcon("rotate", "Core/Assets/Icons/rotate.png");
+		iconManager_->loadIcon("scale", "Core/Assets/Icons/resize.png");
+		iconManager_->loadIcon("add", "Core/Assets/Icons/add.png");
+		iconManager_->loadIcon("select", "Core/Assets/Icons/select.png");
+		iconManager_->loadIcon("save", "Core/Assets/Icons/save.png");
+		iconManager_->loadIcon("delete", "Core/Assets/Icons/delete.png");
+		iconsLoaded_ = true;
+	}
+
 	void EditorUI::render(Editor* editor) {
-		// Get window dimensions
+		if (!iconsLoaded_) {
+			loadIcons();
+		}
+
 		ImGuiIO& io = ImGui::GetIO();
 		ImVec2 viewportSize = io.DisplaySize;
 
-		// Menu bar
+		float toolbarHeight = 50;
+		float toolbarY = 20;
+		float statusBarHeight = 20;
+		float topEdge = toolbarY + toolbarHeight;
+		float bottomEdge = viewportSize.y - statusBarHeight;
+		float totalWidth = viewportSize.x;
+		float totalHeight = bottomEdge - topEdge;
+		
+		const float minHierarchyWidth = 150;
+		const float minPropertiesWidth = 150;
+		const float minViewportWidth = 300;
+		const float minMiddleHeight = 200;
+		const float minConsoleHeight = 80;
+		
+		hierarchyWidth_ = glm::max(minHierarchyWidth, glm::min(hierarchyWidth_, totalWidth - minPropertiesWidth - minViewportWidth));
+		propertiesWidth_ = glm::max(minPropertiesWidth, glm::min(propertiesWidth_, totalWidth - minHierarchyWidth - minViewportWidth));
+		consoleHeight_ = glm::max(minConsoleHeight, glm::min(consoleHeight_, totalHeight - minMiddleHeight));
+		
+		float middleHeight = totalHeight - consoleHeight_;
+		float consoleY = topEdge + middleHeight;
+		float viewportWidth = totalWidth - hierarchyWidth_ - propertiesWidth_;
+		
 		renderMenuBar(editor);
-
-		// Toolbar
 		renderToolbar(editor);
 
-		// CONSTRAIN WINDOWS - Calculate safe areas with boundaries
-		float leftEdge = 0;
-		float rightEdge = viewportSize.x - 250;  // Reserve 250px for right panel
-		float topEdge = 70;  // Below toolbar
-		float bottomEdge = 470;  // Above console
-		float centerLeft = 250;
-		float centerWidth = rightEdge - centerLeft;
-
-		// Hierarchy panel (left) - CONSTRAINED
-		ImGui::SetNextWindowPos(ImVec2(leftEdge, topEdge), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(250, bottomEdge - topEdge), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSizeConstraints(ImVec2(150, 200), ImVec2(400, 500));
+		// Hierarchy
+		ImGui::SetNextWindowPos(ImVec2(0, topEdge), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(hierarchyWidth_, middleHeight), ImGuiCond_Always);
 		renderHierarchyPanel(editor);
 
-		// Properties panel (right) - CONSTRAINED
-		ImGui::SetNextWindowPos(ImVec2(rightEdge, topEdge), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(250, bottomEdge - topEdge), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSizeConstraints(ImVec2(150, 200), ImVec2(400, 500));
+		// Properties
+		ImGui::SetNextWindowPos(ImVec2(totalWidth - propertiesWidth_, topEdge), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(propertiesWidth_, middleHeight), ImGuiCond_Always);
 		renderPropertiesPanel(editor);
 
-		// Viewport (center) - CONSTRAINED - PRIMARY 3D VIEW
-		ImGui::SetNextWindowPos(ImVec2(centerLeft, topEdge), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(centerWidth, bottomEdge - topEdge), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSizeConstraints(ImVec2(300, 200), ImVec2(800, 500));
+		// Viewport
+		ImGui::SetNextWindowPos(ImVec2(hierarchyWidth_, topEdge), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(viewportWidth, middleHeight), ImGuiCond_Always);
 		renderViewport(editor);
 
-		// Debug console (bottom) - CONSTRAINED - ALWAYS VISIBLE
-		ImGui::SetNextWindowPos(ImVec2(0, 470), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(viewportSize.x, viewportSize.y - 490), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSizeConstraints(ImVec2(300, 100), ImVec2(viewportSize.x, viewportSize.y - 100));
+		// Console
+		ImGui::SetNextWindowPos(ImVec2(0, consoleY), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(totalWidth, consoleHeight_), ImGuiCond_Always);
 		g_console.draw("Debug Console##main", nullptr);
 
-		// Status bar (very bottom) - ALWAYS VISIBLE
-		renderStatusBar(editor);
-
-		// Demo windows for reference
-		// if (showDemoWindow_) {
-		//	ImGui::ShowDemoWindow(&showDemoWindow_);
-		// }
+		// Status bar
+		renderStatusBar(editor, bottomEdge, viewportSize.x);
 	}
 
 	void EditorUI::renderMenuBar(Editor* editor) {
 		if (ImGui::BeginMainMenuBar()) {
 			if (ImGui::BeginMenu("File")) {
 				if (ImGui::MenuItem("New Scene", "Ctrl+N")) {
-					// TODO: New scene
-				}
-				if (ImGui::MenuItem("Open Scene", "Ctrl+O")) {
-					// TODO: Open scene
-				}
-				if (ImGui::MenuItem("Save Scene", "Ctrl+S")) {
-					editor->saveScene("untitled.bound");
-					g_console.addLog("Scene saved");
+					editor->clearScene();
+					g_console.addLog("New scene created");
 				}
 				ImGui::Separator();
-				if (ImGui::MenuItem("Exit")) {
-					// TODO: Exit app
+				if (ImGui::MenuItem("Open Scene", "Ctrl+O")) {
+					if (editor->loadScene("scene.scne")) {
+						g_console.addLog("Scene loaded successfully");
+					} else {
+						g_console.addLog("Failed to load scene");
+					}
+				}
+				if (ImGui::MenuItem("Save Scene", "Ctrl+S")) {
+					if (editor->saveScene("scene.scne")) {
+						g_console.addLog("Scene saved successfully");
+					} else {
+						g_console.addLog("Failed to save scene");
+					}
+				}
+				ImGui::Separator();
+				if (ImGui::BeginMenu("Import")) {
+					if (ImGui::MenuItem("Import Model")) {
+						g_console.addLog("[TODO] Import model dialog");
+					}
+					if (ImGui::MenuItem("Import Texture")) {
+						g_console.addLog("[TODO] Import texture dialog");
+					}
+					if (ImGui::MenuItem("Import Asset")) {
+						g_console.addLog("[TODO] Import asset dialog");
+					}
+					ImGui::EndMenu();
+				}
+				if (ImGui::BeginMenu("Export")) {
+					if (ImGui::MenuItem("Export Model")) {
+						g_console.addLog("[TODO] Export model dialog");
+					}
+					if (ImGui::MenuItem("Export Scene")) {
+						g_console.addLog("[TODO] Export scene dialog");
+					}
+					if (ImGui::MenuItem("Export As Prefab")) {
+						g_console.addLog("[TODO] Export as prefab dialog");
+					}
+					ImGui::EndMenu();
+				}
+				ImGui::Separator();
+				if (ImGui::MenuItem("Exit", "Alt+F4")) {
+					g_console.addLog("Exiting application...");
+					editor->requestExit();
 				}
 				ImGui::EndMenu();
 			}
 
 			if (ImGui::BeginMenu("Edit")) {
-				if (ImGui::MenuItem("Undo", "Ctrl+Z")) {
-					// TODO: Undo
-				}
-				if (ImGui::MenuItem("Redo", "Ctrl+Y")) {
-					// TODO: Redo
-				}
-				ImGui::Separator();
 				if (ImGui::MenuItem("Delete", "Delete")) {
 					if (auto selected = editor->getSelectedObject()) {
 						g_console.addLog("Deleted Object %d", selected->id);
@@ -185,56 +234,164 @@ namespace Bound {
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("Help")) {
-				if (ImGui::MenuItem("ImGui Demo")) {
-					showDemoWindow_ = !showDemoWindow_;
-				}
-				ImGui::EndMenu();
-			}
-
 			ImGui::EndMainMenuBar();
 		}
 	}
 
 	void EditorUI::renderToolbar(Editor* editor) {
-		ImGui::SetNextWindowPos(ImVec2(0, 20), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(1280, 50), ImGuiCond_FirstUseEver);
+		ImGuiIO& io = ImGui::GetIO();
+		ImGui::SetNextWindowPos(ImVec2(0, 20), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, 50), ImGuiCond_Always);
 		
-		if (ImGui::Begin("##Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar)) {
+		if (ImGui::Begin("##Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize)) {
+			const float iconSize = 32.0f;
+			
+			// Transform tools with icons
 			ImGui::Text("Transform:");
 			ImGui::SameLine();
-			if (ImGui::Button("Move", ImVec2(50, 0))) {}
+			
+			// Select tool
+			if (iconManager_->hasIcon("select")) {
+				ImGui::PushID("select_tool");
+				if (ImGui::ImageButton("##select", (ImTextureID)(intptr_t)iconManager_->getIconTexture("select"), ImVec2(iconSize, iconSize))) {
+					g_console.addLog("Select tool active");
+				}
+				if (ImGui::IsItemHovered()) ImGui::SetTooltip("Select (1)");
+				ImGui::PopID();
+			} else {
+				if (ImGui::Button("Select", ImVec2(60, 0))) {
+					g_console.addLog("Select tool active");
+				}
+			}
 			ImGui::SameLine();
-			if (ImGui::Button("Rotate", ImVec2(60, 0))) {}
+			
+			// Move tool
+			if (iconManager_->hasIcon("move")) {
+				ImGui::PushID("move_tool");
+				if (ImGui::ImageButton("##move", (ImTextureID)(intptr_t)iconManager_->getIconTexture("move"), ImVec2(iconSize, iconSize))) {
+					g_console.addLog("Move tool selected");
+				}
+				if (ImGui::IsItemHovered()) ImGui::SetTooltip("Move (2)");
+				ImGui::PopID();
+			} else {
+				if (ImGui::Button("Move", ImVec2(50, 0))) {
+					g_console.addLog("Move tool selected");
+				}
+			}
 			ImGui::SameLine();
-			if (ImGui::Button("Scale", ImVec2(50, 0))) {}
-
+			
+			// Rotate tool
+			if (iconManager_->hasIcon("rotate")) {
+				ImGui::PushID("rotate_tool");
+				if (ImGui::ImageButton("##rotate", (ImTextureID)(intptr_t)iconManager_->getIconTexture("rotate"), ImVec2(iconSize, iconSize))) {
+					g_console.addLog("Rotate tool selected");
+				}
+				if (ImGui::IsItemHovered()) ImGui::SetTooltip("Rotate (3)");
+				ImGui::PopID();
+			} else {
+				if (ImGui::Button("Rotate", ImVec2(60, 0))) {
+					g_console.addLog("Rotate tool selected");
+				}
+			}
+			ImGui::SameLine();
+			
+			// Scale tool
+			if (iconManager_->hasIcon("scale")) {
+				ImGui::PushID("scale_tool");
+				if (ImGui::ImageButton("##scale", (ImTextureID)(intptr_t)iconManager_->getIconTexture("scale"), ImVec2(iconSize, iconSize))) {
+					g_console.addLog("Scale tool selected");
+				}
+				if (ImGui::IsItemHovered()) ImGui::SetTooltip("Scale (4)");
+				ImGui::PopID();
+			} else {
+				if (ImGui::Button("Scale", ImVec2(50, 0))) {
+					g_console.addLog("Scale tool selected");
+				}
+			}
+			
 			ImGui::SameLine(300);
+			ImGui::Text("File:");
+			ImGui::SameLine();
+			
+			// Save tool
+			if (iconManager_->hasIcon("save")) {
+				ImGui::PushID("save_tool");
+				if (ImGui::ImageButton("##save", (ImTextureID)(intptr_t)iconManager_->getIconTexture("save"), ImVec2(iconSize, iconSize))) {
+					if (editor->saveScene("scene.scne")) {
+						g_console.addLog("Scene saved successfully");
+					} else {
+						g_console.addLog("Failed to save scene");
+					}
+				}
+				if (ImGui::IsItemHovered()) ImGui::SetTooltip("Save Scene (Ctrl+S)");
+				ImGui::PopID();
+			} else {
+				if (ImGui::Button("Save", ImVec2(50, 0))) {
+					if (editor->saveScene("scene.scne")) {
+						g_console.addLog("Scene saved successfully");
+					} else {
+						g_console.addLog("Failed to save scene");
+					}
+				}
+			}
+			ImGui::SameLine();
+			
+			// Delete tool
+			if (iconManager_->hasIcon("delete")) {
+				ImGui::PushID("delete_tool");
+				if (ImGui::ImageButton("##delete", (ImTextureID)(intptr_t)iconManager_->getIconTexture("delete"), ImVec2(iconSize, iconSize))) {
+					if (auto selected = editor->getSelectedObject()) {
+						g_console.addLog("Deleted Object %d", selected->id);
+						editor->deleteObject(selected->id);
+					} else {
+						g_console.addLog("No object selected to delete");
+					}
+				}
+				if (ImGui::IsItemHovered()) ImGui::SetTooltip("Delete Selected (Del)");
+				ImGui::PopID();
+			} else {
+				if (ImGui::Button("Delete", ImVec2(60, 0))) {
+					if (auto selected = editor->getSelectedObject()) {
+						g_console.addLog("Deleted Object %d", selected->id);
+						editor->deleteObject(selected->id);
+					} else {
+						g_console.addLog("No object selected to delete");
+					}
+				}
+			}
+			
+			ImGui::SameLine(600);
 			ImGui::Text("Create:");
 			ImGui::SameLine();
-			if (ImGui::Button("Cube", ImVec2(60, 0))) {
-				editor->createObject(ObjectType::Cube, glm::vec3(0, 0, 0));
-				g_console.addLog("Created Cube");
-			}
-			ImGui::SameLine();
-			if (ImGui::Button("Pyramid", ImVec2(70, 0))) {
-				editor->createObject(ObjectType::Pyramid, glm::vec3(0, 0, 0));
-				g_console.addLog("Created Pyramid");
-			}
-			ImGui::SameLine();
-			if (ImGui::Button("Plane", ImVec2(60, 0))) {
-				editor->createObject(ObjectType::Floor, glm::vec3(0, -2, 0));
-				g_console.addLog("Created Plane");
+			
+			// Create object dropdown combo
+			static const char* object_types[] = { "Cube", "Pyramid", "Plane" };
+			static int object_current = -1;
+			
+			ImGui::SetNextItemWidth(100);
+			if (ImGui::Combo("##CreateObject", &object_current, object_types, IM_ARRAYSIZE(object_types))) {
+				switch (object_current) {
+					case 0:  // Cube
+						editor->createObject(ObjectType::Cube, glm::vec3(0, 0, 0));
+						g_console.addLog("Created Cube");
+						break;
+					case 1:  // Pyramid
+						editor->createObject(ObjectType::Pyramid, glm::vec3(0, 0, 0));
+						g_console.addLog("Created Pyramid");
+						break;
+					case 2:  // Plane
+						editor->createObject(ObjectType::Floor, glm::vec3(0, -2, 0));
+						g_console.addLog("Created Plane");
+						break;
+				}
+				object_current = -1;  // Reset combo
 			}
 		}
 		ImGui::End();
 	}
 
 	void EditorUI::renderHierarchyPanel(Editor* editor) {
-		ImGui::SetNextWindowPos(ImVec2(0, 70), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(250, 400), ImGuiCond_FirstUseEver);
-
-		if (ImGui::Begin("Hierarchy", nullptr)) {
+		if (ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_NoMove)) {
 			ImGui::Text("Scene Objects (%zu)", editor->getObjects().size());
 			ImGui::Separator();
 
@@ -256,125 +413,140 @@ namespace Bound {
 					g_console.addLog("Selected %s %d", type_str, obj->id);
 				}
 			}
-
-			ImGui::Separator();
-			if (ImGui::Button("Delete Selected", ImVec2(-1, 0))) {
-				if (auto selected = editor->getSelectedObject()) {
-					g_console.addLog("Deleted Object %d", selected->id);
-					editor->deleteObject(selected->id);
-				}
-			}
 		}
 		ImGui::End();
 	}
 
 	void EditorUI::renderPropertiesPanel(Editor* editor) {
-		ImGui::SetNextWindowPos(ImVec2(1030, 70), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(250, 400), ImGuiCond_FirstUseEver);
-
-		if (ImGui::Begin("Properties")) {
+		if (ImGui::Begin("Properties", nullptr, ImGuiWindowFlags_NoMove)) {
 			if (auto selected = editor->getSelectedObject()) {
 				ImGui::Text("Object %d Properties", selected->id);
 				ImGui::Separator();
 
-				// Position
+				// Position with up/down spinners
 				ImGui::Text("Position");
-				ImGui::DragFloat("X##pos", &selected->position.x, 0.1f);
-				ImGui::DragFloat("Y##pos", &selected->position.y, 0.1f);
-				ImGui::DragFloat("Z##pos", &selected->position.z, 0.1f);
+				ImGui::PushItemWidth(-40.0f);
+				ImGui::InputFloat("##PosX", &selected->position.x, 0.1f, 0.5f);
+				ImGui::SameLine();
+				if (ImGui::Button("^##PosXUp", ImVec2(18, 0))) selected->position.x += 0.1f;
+				ImGui::SameLine();
+				if (ImGui::Button("v##PosXDown", ImVec2(18, 0))) selected->position.x -= 0.1f;
+				
+				ImGui::InputFloat("##PosY", &selected->position.y, 0.1f, 0.5f);
+				ImGui::SameLine();
+				if (ImGui::Button("^##PosYUp", ImVec2(18, 0))) selected->position.y += 0.1f;
+				ImGui::SameLine();
+				if (ImGui::Button("v##PosYDown", ImVec2(18, 0))) selected->position.y -= 0.1f;
+				
+				ImGui::InputFloat("##PosZ", &selected->position.z, 0.1f, 0.5f);
+				ImGui::SameLine();
+				if (ImGui::Button("^##PosZUp", ImVec2(18, 0))) selected->position.z += 0.1f;
+				ImGui::SameLine();
+				if (ImGui::Button("v##PosZDown", ImVec2(18, 0))) selected->position.z -= 0.1f;
+				ImGui::PopItemWidth();
 
 				ImGui::Separator();
 
-				// Rotation (in degrees)
-				ImGui::Text("Rotation");
+				// Rotation with up/down spinners (in degrees)
+				ImGui::Text("Rotation (degrees)");
 				float rotX = glm::degrees(selected->rotation.x);
 				float rotY = glm::degrees(selected->rotation.y);
 				float rotZ = glm::degrees(selected->rotation.z);
 
-				if (ImGui::DragFloat("X##rot", &rotX, 0.5f)) {
+				ImGui::PushItemWidth(-40.0f);
+				if (ImGui::InputFloat("##RotX", &rotX, 1.0f, 5.0f)) {
 					selected->rotation.x = glm::radians(rotX);
 				}
-				if (ImGui::DragFloat("Y##rot", &rotY, 0.5f)) {
+				ImGui::SameLine();
+				if (ImGui::Button("^##RotXUp", ImVec2(18, 0))) rotX += 5.0f, selected->rotation.x = glm::radians(rotX);
+				ImGui::SameLine();
+				if (ImGui::Button("v##RotXDown", ImVec2(18, 0))) rotX -= 5.0f, selected->rotation.x = glm::radians(rotX);
+				
+				if (ImGui::InputFloat("##RotY", &rotY, 1.0f, 5.0f)) {
 					selected->rotation.y = glm::radians(rotY);
 				}
-				if (ImGui::DragFloat("Z##rot", &rotZ, 0.5f)) {
+				ImGui::SameLine();
+				if (ImGui::Button("^##RotYUp", ImVec2(18, 0))) rotY += 5.0f, selected->rotation.y = glm::radians(rotY);
+				ImGui::SameLine();
+				if (ImGui::Button("v##RotYDown", ImVec2(18, 0))) rotY -= 5.0f, selected->rotation.y = glm::radians(rotY);
+				
+				if (ImGui::InputFloat("##RotZ", &rotZ, 1.0f, 5.0f)) {
 					selected->rotation.z = glm::radians(rotZ);
 				}
+				ImGui::SameLine();
+				if (ImGui::Button("^##RotZUp", ImVec2(18, 0))) rotZ += 5.0f, selected->rotation.z = glm::radians(rotZ);
+				ImGui::SameLine();
+				if (ImGui::Button("v##RotZDown", ImVec2(18, 0))) rotZ -= 5.0f, selected->rotation.z = glm::radians(rotZ);
+				ImGui::PopItemWidth();
 
 				ImGui::Separator();
 
-				// Scale
+				// Scale with up/down spinners
 				ImGui::Text("Scale");
-				ImGui::DragFloat("X##scale", &selected->scale.x, 0.1f, 0.1f, 10.0f);
-				ImGui::DragFloat("Y##scale", &selected->scale.y, 0.1f, 0.1f, 10.0f);
-				ImGui::DragFloat("Z##scale", &selected->scale.z, 0.1f, 0.1f, 10.0f);
+				ImGui::PushItemWidth(-40.0f);
+				ImGui::InputFloat("##ScaleX", &selected->scale.x, 0.1f, 0.5f);
+				ImGui::SameLine();
+				if (ImGui::Button("^##ScaleXUp", ImVec2(18, 0))) selected->scale.x += 0.1f;
+				ImGui::SameLine();
+				if (ImGui::Button("v##ScaleXDown", ImVec2(18, 0))) selected->scale.x = glm::max(0.1f, selected->scale.x - 0.1f);
+				
+				ImGui::InputFloat("##ScaleY", &selected->scale.y, 0.1f, 0.5f);
+				ImGui::SameLine();
+				if (ImGui::Button("^##ScaleYUp", ImVec2(18, 0))) selected->scale.y += 0.1f;
+				ImGui::SameLine();
+				if (ImGui::Button("v##ScaleYDown", ImVec2(18, 0))) selected->scale.y = glm::max(0.1f, selected->scale.y - 0.1f);
+				
+				ImGui::InputFloat("##ScaleZ", &selected->scale.z, 0.1f, 0.5f);
+				ImGui::SameLine();
+				if (ImGui::Button("^##ScaleZUp", ImVec2(18, 0))) selected->scale.z += 0.1f;
+				ImGui::SameLine();
+				if (ImGui::Button("v##ScaleZDown", ImVec2(18, 0))) selected->scale.z = glm::max(0.1f, selected->scale.z - 0.1f);
+				ImGui::PopItemWidth();
 
 				ImGui::Separator();
 
 				// Color
 				ImGui::Text("Color");
-				ImGui::ColorEdit3("##color", &selected->color.x);
+				float oldColor[3] = { selected->color.x, selected->color.y, selected->color.z };
+				if (ImGui::ColorEdit3("##color", &selected->color.x)) {
+					// Only update mesh if color actually changed
+					if (oldColor[0] != selected->color.x || 
+					    oldColor[1] != selected->color.y || 
+					    oldColor[2] != selected->color.z) {
+						selected->updateMeshColor();
+					}
+				}
 			} else {
 				ImGui::Text("No object selected");
-				ImGui::Text("Select an object from the Hierarchy");
 			}
 		}
 		ImGui::End();
 	}
 
 	void EditorUI::renderViewport(Editor* editor) {
-		ImGui::SetNextWindowPos(ImVec2(250, 70), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(780, 400), ImGuiCond_FirstUseEver);
-
-		if (ImGui::Begin("Viewport")) {
-			// Show viewport info
+		if (ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoMove)) {
 			ImGui::Text("3D Scene Viewport");
-			ImGui::Text("WASD = Move | Right-Click = Rotate | Scroll = Zoom");
-			ImGui::Separator();
-
-			// Scene statistics
+			ImGui::Text("WASD = Move | Right-Click = Rotate | Left-Click = Select");
 			ImGui::Text("Objects in Scene: %zu", editor->getObjects().size());
+			
 			if (auto selected = editor->getSelectedObject()) {
-				ImGui::Text("Selected: %d", selected->id);
+				ImGui::Separator();
+				ImGui::Text("Selected: Object %d", selected->id);
 				ImGui::Text("Position: (%.2f, %.2f, %.2f)", 
 					selected->position.x, selected->position.y, selected->position.z);
-				ImGui::Text("Scale: (%.2f, %.2f, %.2f)", 
-					selected->scale.x, selected->scale.y, selected->scale.z);
-			} else {
-				ImGui::Text("Selected: None");
 			}
-
-			ImGui::Separator();
-
-			// Camera info
-			if (auto camera = editor->getEditorCamera()) {
-				ImGui::Text("Camera Controls:");
-				ImGui::BulletText("WASD - Move forward/back/left/right");
-				ImGui::BulletText("Mouse Right-Click - Look around");
-				ImGui::BulletText("Scroll - Change FOV");
-			}
-
-			ImGui::Separator();
-			ImGui::TextWrapped("The 3D scene is rendered in the viewport above. "
-				"Create objects from the toolbar, select them in the hierarchy, "
-				"and modify their properties on the right panel.");
-
-			// Show available space for rendering
-			ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-			ImGui::Text("Viewport Size: %.0fx%.0f", viewportSize.x, viewportSize.y);
 		}
 		ImGui::End();
 	}
 
-	void EditorUI::renderStatusBar(Editor* editor) {
-		ImGui::SetNextWindowPos(ImVec2(0, 700), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(1280, 20), ImGuiCond_FirstUseEver);
+	void EditorUI::renderStatusBar(Editor* editor, float yPosition, float width) {
+		ImGui::SetNextWindowPos(ImVec2(0, yPosition), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(width, 20), ImGuiCond_Always);
 
 		if (ImGui::Begin("##StatusBar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize)) {
-			ImGui::Text("Objects: %zu | FPS: %.1f | Mode: %s", 
+			ImGui::Text("Objects: %zu | FPS: %.1f", 
 				editor->getObjects().size(), 
-				ImGui::GetIO().Framerate,
-				editor->isPlayMode() ? "PLAY" : "EDIT");
+				ImGui::GetIO().Framerate);
 		}
 		ImGui::End();
 	}

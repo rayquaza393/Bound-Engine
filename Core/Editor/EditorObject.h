@@ -53,6 +53,9 @@ namespace Bound {
 
 		// Generate mesh based on type
 		void generateMesh();
+		
+		// Update mesh color (without regenerating geometry)
+		void updateMeshColor();
 	};
 
 }

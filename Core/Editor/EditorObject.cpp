@@ -54,4 +54,12 @@ namespace Bound {
 		mesh.gpuDirty = true;
 	}
 
+	void EditorObject::updateMeshColor() {
+		glm::vec3 glmColor(color.x, color.y, color.z);
+		for (auto& vertex : mesh.vertices) {
+			vertex.color = glmColor;
+		}
+		mesh.gpuDirty = true;
+	}
+
 }
